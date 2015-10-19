@@ -36,10 +36,96 @@
 --   me. I can't remember where I found the button template, but that is hardly
 --   plagiarism.
 
-require("cell")
+-- PROTOTYPES & "CONSTRUCTORS":
 
-local assets = require("assets/assets")
-local highscores = require("highscores")
+-- The Cell table is used for every individual square on the game board.
+-- A cell can contain a mine, it can be clicked, it can be checked and it can
+-- be flagged. It has a size and coordinates. It also contains the number of
+-- neighbouring mines.
+Cell = {
+	x,
+	y,
+	size = CELL_SIZE,
+	clicked = false,
+	mine = false,
+	numMines = 0,
+	checked = false,
+	flagged = false
+}
+
+function Cell:new(x, y)
+	obj = {
+		x = x,
+		y = y,
+	}
+	setmetatable(obj, self)
+	self.__index = self
+	return obj
+end
+
+-- The button table prototypes a clickable button such as the smiley buttons.
+-- A button has a height, width and coordinates. A button can be clicked.
+Button = {
+	x,
+	y,
+	width = 60,
+	height = 60,
+	clicked = false
+}
+
+function Button:new(x, y, name)
+	obj = {
+		x = x,
+		y = y
+	}
+	setmetatable(obj, self)
+	self.__index = self
+	return obj
+end
+
+-- If the cell isn't a mine, this function counts the amount of mines there are
+-- in the adjacent cells. If there aren't any, it will call the checkNeighbours
+-- function for all adajcent tiles. It checks at the start whether a tile has 
+-- already beenchecked to avoid an infinite loop. When flagged tiles are cleared
+-- in this way, the flags are properly removed, unless it is done to clear the 
+-- board at the end of the game.
+function Cell:checkNeighbours(index1, index2)
+	if self.mine == false then
+		if not (state == "endgame") then
+			if self.flagged == true then
+				self.flagged = false
+				totalFlags = totalFlags - 1
+			end
+		end
+		if self.checked == false then
+			for i = -1, 1 do
+				for j = -1, 1 do
+					if not (i == 0 and j == 0) 
+					and (index1 + i >= 0 and index1 + i <= NUM_ROWS - 1)
+					and (index2 + j >= 0 and index2 + j <= NUM_COLS - 1) then
+						if board[index1 + i][index2 + j].mine == true then
+							self.numMines = self.numMines + 1
+						end
+					end
+				end
+			end
+			self.checked = true
+			if self.numMines == 0 then
+				for i = -1, 1 do
+					for j = -1, 1 do
+						if not (i == 0 and j == 0)
+						and (index1 + i >= 0 and index1 + i <= NUM_ROWS - 1)
+						and (index2 + j >= 0 and index2 + j <= NUM_COLS - 1) 
+						then
+							board[index1 + i][index2 + j]:
+							checkNeighbours(index1 + i, index2 + j)
+						end
+					end
+				end
+			end
+		end
+	end
+end
 
 -- The love.load function is called at the start of the game.
 -- In this function some variables are initialised.
@@ -92,6 +178,34 @@ function love.load()
 
 	-- Graphics and audio:
 
+	block = {
+		love.graphics.newImage("1.png"),
+		love.graphics.newImage("2.png"),
+		love.graphics.newImage("3.png"),
+		love.graphics.newImage("4.png"),
+		love.graphics.newImage("5.png"),
+		love.graphics.newImage("6.png"),
+		love.graphics.newImage("7.png"),
+		love.graphics.newImage("8.png"),
+		unclicked = love.graphics.newImage("block_unclicked.png"),
+		clicked = love.graphics.newImage("block_clicked.png"),
+		flag = love.graphics.newImage("flag.png"),
+		bomb = love.graphics.newImage("bomb.png"),
+		bomb_clicked = love.graphics.newImage("bomb_clicked.png"),
+		bomb_wrong = love.graphics.newImage("bomb_wrong.png")
+	}
+
+	smiley = {
+		def = love.graphics.newImage("smiley.png"),
+		win = love.graphics.newImage("smiley_win.png"),
+		lose = love.graphics.newImage("smiley_lose.png"),
+		o = love.graphics.newImage("smiley_o.png")
+	}
+
+	audio = {
+		win = love.audio.newSource("win.wav", static),
+		lose = love.audio.newSource("bomb_explode.wav", static)
+	}
 
 	-- Button initialisation
 	easy = Button:new(WINDOW_WIDTH * 1/4 - 30, 30)
