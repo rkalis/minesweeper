@@ -1,6 +1,3 @@
--- Framework and assignment made by Jordy Perlee
--- Report any critical bugs to Jordy.Perlee@uva.nl
-
 function love.conf(t)
     -- Global variables. Use these in your program.
     CELL_SIZE = 40

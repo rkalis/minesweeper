@@ -36,6 +36,8 @@
 --   me. I can't remember where I found the button template, but that is hardly
 --   plagiarism.
 
+local assets = require("assets")
+
 -- PROTOTYPES & "CONSTRUCTORS":
 
 -- The Cell table is used for every individual square on the game board.
@@ -174,37 +176,6 @@ function love.load()
 		easy = {},
 		medium = {},
 		hard = {}
-	}
-
-	-- Graphics and audio:
-
-	block = {
-		love.graphics.newImage("1.png"),
-		love.graphics.newImage("2.png"),
-		love.graphics.newImage("3.png"),
-		love.graphics.newImage("4.png"),
-		love.graphics.newImage("5.png"),
-		love.graphics.newImage("6.png"),
-		love.graphics.newImage("7.png"),
-		love.graphics.newImage("8.png"),
-		unclicked = love.graphics.newImage("block_unclicked.png"),
-		clicked = love.graphics.newImage("block_clicked.png"),
-		flag = love.graphics.newImage("flag.png"),
-		bomb = love.graphics.newImage("bomb.png"),
-		bomb_clicked = love.graphics.newImage("bomb_clicked.png"),
-		bomb_wrong = love.graphics.newImage("bomb_wrong.png")
-	}
-
-	smiley = {
-		def = love.graphics.newImage("smiley.png"),
-		win = love.graphics.newImage("smiley_win.png"),
-		lose = love.graphics.newImage("smiley_lose.png"),
-		o = love.graphics.newImage("smiley_o.png")
-	}
-
-	audio = {
-		win = love.audio.newSource("win.wav", static),
-		lose = love.audio.newSource("bomb_explode.wav", static)
 	}
 
 	-- Button initialisation
@@ -617,14 +588,14 @@ function dispCell(cell)
 		victory = false
 		state = "endgame"
 		
-		love.graphics.draw(block.bomb_clicked, cell.x, cell.y, 0, 
+		love.graphics.draw(assets.graphics.block.bomb_clicked, cell.x, cell.y, 0, 
 						   cell.size / 120)
 	elseif cell.checked == true then
 		dispNumbers(cell)
 	elseif cell.flagged == true then
-		love.graphics.draw(block.flag, cell.x, cell.y, 0, cell.size / 120)
+		love.graphics.draw(assets.graphics.block.flag, cell.x, cell.y, 0, cell.size / 120)
 	else
-		love.graphics.draw(block.unclicked, cell.x, cell.y, 0, cell.size / 120)
+		love.graphics.draw(assets.graphics.block.unclicked, cell.x, cell.y, 0, cell.size / 120)
 	end
 	love.graphics.setColor(100,100,100)
 	love.graphics.rectangle("line", cell.x, cell.y, cell.size, cell.size)
@@ -635,9 +606,9 @@ end
 function dispNumbers(cell)
 	love.graphics.setColor(255,255,255)
 	if cell.numMines == 0 then
-		love.graphics.draw(block.clicked, cell.x, cell.y, 0, cell.size / 120)
+		love.graphics.draw(assets.graphics.block.clicked, cell.x, cell.y, 0, cell.size / 120)
 	else
-		love.graphics.draw(block[cell.numMines], 
+		love.graphics.draw(assets.graphics.block[cell.numMines], 
 						   cell.x, cell.y, 0, cell.size / 120)
 	end
 end
@@ -646,13 +617,13 @@ end
 -- It also changes the smiley to one with an opened mouth when the mouse is
 -- down.
 function dispMouseDown(cell)
-	if  (love.mouse.isDown("l") or love.mouse.isDown("r"))
+	if  (love.mouse.isDown(1) or love.mouse.isDown(2))
 	and (love.mouse.getX() > cell.x and love.mouse.getX() 
 	<    cell.x + cell.size) and (love.mouse.getY()
 	>    cell.y and love.mouse.getY() < cell.y + cell.size
 	and  cell.checked == false) then
 	  	love.graphics.setColor(255,255,255)
-	  	love.graphics.draw(block.clicked, cell.x, cell.y, 0, cell.size / 120)
+	  	love.graphics.draw(assets.graphics.block.clicked, cell.x, cell.y, 0, cell.size / 120)
 		drawSmiley("o", medium.x, medium.y)
 		if state == "menu" then
 			drawSmiley("o", easy.x, easy.y)
@@ -663,7 +634,7 @@ end
 
 -- This function draws a smiley of the passed type at the passed coordinates.
 function drawSmiley(type, x, y)
-	love.graphics.draw(smiley[type], x, y, 0, 1/2)
+	love.graphics.draw(assets.graphics.smiley[type], x, y, 0, 1/2)
 end
 
 -- This function stops the timer and plays the associated audio fragment at the
@@ -681,12 +652,12 @@ function endgame(outcome)
 			dispCell(board[i][j])
 			if board[i][j].mine == true and board[i][j].clicked == false then
 				love.graphics.setColor(255,255,255)
-				love.graphics.draw(block.bomb, board[i][j].x, board[i][j].y,
+				love.graphics.draw(assets.graphics.block.bomb, board[i][j].x, board[i][j].y,
 								   0, board[i][j].size / 120)
 			elseif board[i][j].mine == false and board[i][j].flagged == true 
 				then
 				love.graphics.setColor(255,255,255)
-				love.graphics.draw(block.bomb_wrong, board[i][j].x, 
+				love.graphics.draw(assets.graphics.block.bomb_wrong, board[i][j].x, 
 								   board[i][j].y, 0, board[i][j].size / 120)
 			end
 			love.graphics.setColor(100,100,100)
@@ -702,7 +673,7 @@ function endgame(outcome)
 	-- repeat each time the endgame function is called in the love.draw 
 	-- function. 
 	if ended == false then
-		love.audio.play(audio[outcome])
+		love.audio.play(assets.audio[outcome])
 		ended = true
 	end
 end
