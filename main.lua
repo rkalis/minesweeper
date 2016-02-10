@@ -62,9 +62,7 @@ function love.load()
     time = 0
     difficulty = "medium"
     
-    love.window.setTitle("Minesweeper Xxtreme Relo4ded 2.0: Retribution")
     love.graphics.setBackgroundColor(170,170,170)
-    love.filesystem.setIdentity("Minesweeper")
 
     highscores = Highscores:new("highscores_easy.txt",
                                 "highscores_medium.txt",
