@@ -36,7 +36,7 @@
 --   me. I can't remember where I found the button template, but that is hardly
 --   plagiarism.
 
-local assets = require("assets")
+assets = require("assets")
 require("cell")
 require("button")
 require("highscores")
@@ -52,7 +52,7 @@ require("highscores")
 -- Lastly the state is set to menu.
 function love.load()
     totalFlags = 0
-    victory = true
+    outcome = "win"
     font = love.graphics.newFont(15)
     ended = false
     startTime = 0
@@ -92,10 +92,19 @@ function love.update(dt)
     if state == "play" then
         score = score + dt
     elseif state == "endgame" then
+        if time == 0 then
+            love.audio.play(assets.audio[outcome])
+        end
         time = time + dt
-        if time >= 3 then
-            if victory == true then
+        if outcome == "win" then
+            if time >= 3 then
                 state = "highscoresEnter"
+            end
+        elseif outcome == "lose" then
+            for i = 0, NUM_ROWS - 1 do
+                for j = 0, NUM_COLS - 1 do
+                    board[i][j]:checkNeighbours(i, j, false)
+                end
             end
         end
     end
@@ -187,12 +196,16 @@ function love.mousereleased(x, y, button)
             if button == 1 then
                 if board[index1][index2].flagged == false then
                     board[index1][index2].clicked = true
+                    if board[index1][index2].mine == true then
+                        outcome = "lose"
+                        state = "endgame"
+                    end
                     if state == "firstmove" then
                         setMines(index1, index2)
                         startTime = love.timer.getTime()
                         state = "play"
                     end
-                    board[index1][index2]:checkNeighbours(index1, index2)
+                    board[index1][index2]:checkNeighbours(index1, index2, true)
 
                     -- It is checked after each left click whether this click
                     -- has caused victory.
@@ -278,7 +291,12 @@ function love.draw()
     if state == "play" or state == "firstmove" or state == "endgame" 
     or state == "highscoresEnter" or state == "highscoresDisplay" then
         love.graphics.setColor(255,255,255)
-        drawSmiley("def", medium.x, medium.y)
+        if (love.mouse.isDown(1) or love.mouse.isDown(2)) and
+           love.mouse.getY() > STATS_HEIGHT then
+            drawSmiley("o", medium.x, medium.y)
+        else
+            drawSmiley("def", medium.x, medium.y)
+        end
 
         love.graphics.setColor(0,0,0)
         love.graphics.setFont(font)
@@ -313,21 +331,19 @@ function love.draw()
     -- The game board:
 
     -- Draws the standard board if the state is not endgame.
-    if state == "play" or state == "menu" or state == "firstmove" then
+    if state == "play" or state == "menu" or 
+       state == "firstmove" or state == "endgame" or
+       state == "highscoresEnter" or state == "highscoresDisplay" then
         for i = 0, NUM_ROWS - 1 do
             for j = 0, NUM_COLS - 1 do
-                dispCell(board[i][j])
-                dispMouseDown(board[i][j])
+                board[i][j]:draw()
             end
         end
 
     -- Draws the fully revealed board at the end of the game.
     elseif state == "endgame" then
-        if victory == true then
-            endgame("win")
-        elseif victory == false then
-            endgame("lose")
-        end
+        love.graphics.setColor(255,255,255)
+        drawSmiley(outcome, medium.x, medium.y)
     end
 
     -- The high score overlay:
@@ -337,7 +353,6 @@ function love.draw()
     -- An input box is drawn over the board, as well as the input the 
     -- user gives.
     if state == "highscoresEnter" then
-        endgame("win")
         love.graphics.setColor(0,0,0)
         love.graphics.rectangle("line", WINDOW_WIDTH / 2 - 100,
                                 WINDOW_HEIGHT / 2 - 50, 200, 100)
@@ -357,7 +372,6 @@ function love.draw()
                              WINDOW_HEIGHT / 2 - 10, 98, "left")
     -- A rectangle is drawn over the board, as well as the list of high scores.
     elseif state == "highscoresDisplay" then
-        endgame("win")
         love.graphics.setColor(0,0,0)
         love.graphics.rectangle("line", WINDOW_WIDTH / 2 - 125,
                                 WINDOW_HEIGHT / 2 - 200, 250, 400)
@@ -384,101 +398,7 @@ function love.draw()
     end
 end
 
--- This function displays a cell depending on the state it is in.
--- If the state is clicked and it is a mine, the game is lost and the state
--- changes to endgame.
-function dispCell(cell)
-    love.graphics.setColor(255,255,255)
-    if cell.clicked == true and cell.mine == true then
-        victory = false
-        state = "endgame"
-        
-        love.graphics.draw(assets.graphics.block.bomb_clicked, cell.x, cell.y, 0, 
-                           cell.size / 120)
-    elseif cell.checked == true then
-        dispNumbers(cell)
-    elseif cell.flagged == true then
-        love.graphics.draw(assets.graphics.block.flag, cell.x, cell.y, 0, cell.size / 120)
-    else
-        love.graphics.draw(assets.graphics.block.unclicked, cell.x, cell.y, 0, cell.size / 120)
-    end
-    love.graphics.setColor(100,100,100)
-    love.graphics.rectangle("line", cell.x, cell.y, cell.size, cell.size)
-end
-
--- This function displays the number of mines in the adjacent cells, if there
--- aren't any, an empty cell is displayed.
-function dispNumbers(cell)
-    love.graphics.setColor(255,255,255)
-    if cell.numMines == 0 then
-        love.graphics.draw(assets.graphics.block.clicked, cell.x, cell.y, 0, cell.size / 120)
-    else
-        love.graphics.draw(assets.graphics.block[cell.numMines], 
-                           cell.x, cell.y, 0, cell.size / 120)
-    end
-end
-
--- This function displays a clicked cell when the mouse is down on that cell.
--- It also changes the smiley to one with an opened mouth when the mouse is
--- down.
-function dispMouseDown(cell)
-    if  (love.mouse.isDown(1) or love.mouse.isDown(2))
-    and (love.mouse.getX() > cell.x and love.mouse.getX() 
-    <    cell.x + cell.size) and (love.mouse.getY()
-    >    cell.y and love.mouse.getY() < cell.y + cell.size
-    and  cell.checked == false) then
-        love.graphics.setColor(255,255,255)
-        love.graphics.draw(assets.graphics.block.clicked, cell.x, cell.y, 0, cell.size / 120)
-        drawSmiley("o", medium.x, medium.y)
-        if state == "menu" then
-            drawSmiley("o", easy.x, easy.y)
-            drawSmiley("o", hard.x, hard.y)
-        end
-    end
-end
-
 -- This function draws a smiley of the passed type at the passed coordinates.
 function drawSmiley(type, x, y)
     love.graphics.draw(assets.graphics.smiley[type], x, y, 0, 1/2)
-end
-
--- This function stops the timer and plays the associated audio fragment at the
--- end of the game. It also reveals the entire game board, showing where
--- all the bombas are. It also shows where incorrect flags were placed.
-function endgame(outcome)
-    -- This displays the game board after the game is over.
-    for i = 0, NUM_ROWS - 1 do
-        for j = 0, NUM_COLS - 1 do
-            -- If the outcome is a loss, then the board first needs to be
-            -- cleared, if it's a win, the board already is cleared.
-            if outcome == "lose" then
-                board[i][j]:checkNeighbours(i, j)
-            end
-            dispCell(board[i][j])
-            if board[i][j].mine == true and board[i][j].clicked == false then
-                love.graphics.setColor(255,255,255)
-                love.graphics.draw(assets.graphics.block.bomb, board[i][j].x, board[i][j].y,
-                                   0, board[i][j].size / 120)
-            elseif board[i][j].mine == false and board[i][j].flagged == true 
-                then
-                love.graphics.setColor(255,255,255)
-                love.graphics.draw(assets.graphics.block.bomb_wrong, board[i][j].x, 
-                                   board[i][j].y, 0, board[i][j].size / 120)
-            end
-            love.graphics.setColor(100,100,100)
-            love.graphics.rectangle("line", board[i][j].x, board[i][j].y,
-                                    board[i][j].size, board[i][j].size)
-        end
-    end
-    -- This draws a smiley depending on the outcome
-    love.graphics.setColor(255,255,255)
-    drawSmiley(outcome, medium.x, medium.y)
-    -- These things only need to be executed only once at the end of the game:
-    -- the endgame audio is played. Then ended is set to true so that it won't 
-    -- repeat each time the endgame function is called in the love.draw 
-    -- function. 
-    if ended == false then
-        love.audio.play(assets.audio[outcome])
-        ended = true
-    end
 end

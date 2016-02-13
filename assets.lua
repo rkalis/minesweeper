@@ -1,6 +1,7 @@
 local assets = {
     graphics = {
         block = {
+            [0] = love.graphics.newImage("assets/graphics/block_clicked.png"),
             love.graphics.newImage("assets/graphics/1.png"),
             love.graphics.newImage("assets/graphics/2.png"),
             love.graphics.newImage("assets/graphics/3.png"),
@@ -10,7 +11,6 @@ local assets = {
             love.graphics.newImage("assets/graphics/7.png"),
             love.graphics.newImage("assets/graphics/8.png"),
             unclicked = love.graphics.newImage("assets/graphics/block_unclicked.png"),
-            clicked = love.graphics.newImage("assets/graphics/block_clicked.png"),
             flag = love.graphics.newImage("assets/graphics/flag.png"),
             bomb = love.graphics.newImage("assets/graphics/bomb.png"),
             bomb_clicked = love.graphics.newImage("assets/graphics/bomb_clicked.png"),

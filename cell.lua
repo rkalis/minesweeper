@@ -29,12 +29,11 @@ end
 -- already been checked to avoid an infinite loop. When flagged tiles are cleared
 -- in this way, the flags are properly removed, unless it is done to clear the 
 -- board at the end of the game.
-function Cell:checkNeighbours(index1, index2)
-    if self.mine == true then return end
+function Cell:checkNeighbours(index1, index2, clearFlags)
+    if self.mine == true then self.checked = true; return end
 
     -- Clears flag
-    -- TODO: Cell instance shouldn't know about global game state
-    if not (state == "endgame") then
+    if clearFlags == true then
         if self.flagged == true then
             self.flagged = false
             totalFlags = totalFlags - 1
@@ -70,4 +69,37 @@ function Cell:checkNeighbours(index1, index2)
             end
         end
     end
+end
+
+-- This function displays a cell depending on the state it is in.
+-- If the state is clicked and it is a mine, the game is lost and the state
+-- changes to endgame.
+function Cell:draw()
+    love.graphics.setColor(255,255,255)
+    -- If it's being clicked, display the clicked sprite
+    if self.checked == true then
+        if self.mine == true then
+            if self.clicked == true then
+                love.graphics.draw(assets.graphics.block.bomb_clicked, self.x, self.y, 0, self.size / 120)
+            else
+                love.graphics.draw(assets.graphics.block.bomb, self.x, self.y, 0, self.size / 120)
+            end
+        elseif self.flagged == true then
+            love.graphics.draw(assets.graphics.block.bomb_wrong, self.x, self.y, 0, self.size / 120)
+        else
+            love.graphics.draw(assets.graphics.block[self.numMines], self.x, self.y, 0, self.size / 120)
+        end
+    else
+        if self.flagged == true then
+            love.graphics.draw(assets.graphics.block.flag, self.x, self.y, 0, self.size / 120)
+        elseif (love.mouse.isDown(1) or love.mouse.isDown(2)) and 
+           (love.mouse.getX() > self.x and love.mouse.getX() < self.x + self.size) and
+           (love.mouse.getY() > self.y and love.mouse.getY() < self.y + self.size) then
+            love.graphics.draw(assets.graphics.block[0], self.x, self.y, 0, self.size / 120)
+        else
+            love.graphics.draw(assets.graphics.block.unclicked, self.x, self.y, 0, self.size / 120)
+        end
+    end
+    love.graphics.setColor(100,100,100)
+    love.graphics.rectangle("line", self.x, self.y, self.size, self.size)
 end
