@@ -86,6 +86,32 @@ function Highscores:save(difficulty)
     self.files[difficulty]:close()
 end
 
+function Highscores:draw(difficulty)
+    love.graphics.setColor(0,0,0)
+    love.graphics.rectangle("line", WINDOW_WIDTH / 2 - 125,
+                            WINDOW_HEIGHT / 2 - 200, 250, 400)
+    love.graphics.setColor(200,200,200)
+    love.graphics.rectangle("fill", WINDOW_WIDTH / 2 - 125,
+                            WINDOW_HEIGHT / 2 - 200, 250, 400)
+    love.graphics.setColor(0,0,0)
+    love.graphics.printf("HIGH SCORES:", WINDOW_WIDTH / 2 - 125,
+                         WINDOW_HEIGHT / 2 - 190, 250, "center")
+    for i = 1, 10 do
+        if self.highscores[difficulty][i] ~= nil 
+        and self.highscores[difficulty][i][1] ~= nil
+        and self.highscores[difficulty][i][2] ~= nil then
+            love.graphics.print(i, WINDOW_WIDTH / 2 - 110, 
+                                   WINDOW_HEIGHT / 2 - 150 + i * 20)
+            love.graphics.print(highscores.highscores[difficulty][i][1], 
+                                WINDOW_WIDTH / 2 - 80, 
+                                WINDOW_HEIGHT / 2 - 150 + i * 20)
+            love.graphics.print(highscores.highscores[difficulty][i][2],
+                                WINDOW_WIDTH / 2 + 70,
+                                WINDOW_HEIGHT / 2 - 150 + i * 20)
+        end
+    end
+end
+
 -- Bubble Sort algorithm:
 -- Source: http://rosettacode.org/wiki/Sorting_algorithms/Bubble_sort#Lua
 -- Edited to work with the highscores table by using the compareTables

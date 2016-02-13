@@ -96,15 +96,14 @@ function love.update(dt)
             love.audio.play(assets.audio[outcome])
         end
         time = time + dt
+        for i = 0, NUM_ROWS - 1 do
+            for j = 0, NUM_COLS - 1 do
+                board[i][j]:checkNeighbours(i, j, false)
+            end
+        end
         if outcome == "win" then
             if time >= 3 then
                 state = "highscoresEnter"
-            end
-        elseif outcome == "lose" then
-            for i = 0, NUM_ROWS - 1 do
-                for j = 0, NUM_COLS - 1 do
-                    board[i][j]:checkNeighbours(i, j, false)
-                end
             end
         end
     end
@@ -339,9 +338,9 @@ function love.draw()
                 board[i][j]:draw()
             end
         end
-
+    end
     -- Draws the fully revealed board at the end of the game.
-    elseif state == "endgame" then
+    if state == "endgame" then
         love.graphics.setColor(255,255,255)
         drawSmiley(outcome, medium.x, medium.y)
     end
@@ -353,6 +352,8 @@ function love.draw()
     -- An input box is drawn over the board, as well as the input the 
     -- user gives.
     if state == "highscoresEnter" then
+        love.graphics.setColor(255,255,255)
+        drawSmiley(outcome, medium.x, medium.y)
         love.graphics.setColor(0,0,0)
         love.graphics.rectangle("line", WINDOW_WIDTH / 2 - 100,
                                 WINDOW_HEIGHT / 2 - 50, 200, 100)
@@ -372,29 +373,9 @@ function love.draw()
                              WINDOW_HEIGHT / 2 - 10, 98, "left")
     -- A rectangle is drawn over the board, as well as the list of high scores.
     elseif state == "highscoresDisplay" then
-        love.graphics.setColor(0,0,0)
-        love.graphics.rectangle("line", WINDOW_WIDTH / 2 - 125,
-                                WINDOW_HEIGHT / 2 - 200, 250, 400)
-        love.graphics.setColor(200,200,200)
-        love.graphics.rectangle("fill", WINDOW_WIDTH / 2 - 125,
-                                WINDOW_HEIGHT / 2 - 200, 250, 400)
-        love.graphics.setColor(0,0,0)
-        love.graphics.printf("HIGH SCORES:", WINDOW_WIDTH / 2 - 125,
-                             WINDOW_HEIGHT / 2 - 190, 250, "center")
-        for i = 1, 10 do
-            if highscores.highscores[difficulty][i] ~= nil 
-            and highscores.highscores[difficulty][i][1] ~= nil
-            and highscores.highscores[difficulty][i][2] ~= nil then
-                love.graphics.print(i, WINDOW_WIDTH / 2 - 110, 
-                                       WINDOW_HEIGHT / 2 - 150 + i * 20)
-                love.graphics.print(highscores.highscores[difficulty][i][1], 
-                                    WINDOW_WIDTH / 2 - 80, 
-                                    WINDOW_HEIGHT / 2 - 150 + i * 20)
-                love.graphics.print(highscores.highscores[difficulty][i][2],
-                                    WINDOW_WIDTH / 2 + 70,
-                                    WINDOW_HEIGHT / 2 - 150 + i * 20)
-            end
-        end
+        love.graphics.setColor(255,255,255)
+        drawSmiley(outcome, medium.x, medium.y)
+        highscores:draw(difficulty)
     end
 end
 
