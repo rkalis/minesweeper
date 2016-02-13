@@ -1,7 +1,4 @@
---  Name          : Rosco Kalis
---  Student ID    : 10771603
-
--- Minesweeper/main.lua
+-- LuaSweeper/main.lua
 
 -- * This application runs my personal version of the famous game Minesweeper.
 -- * At the start the user is asked to select a difficulty. Based on this
