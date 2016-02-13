@@ -107,6 +107,11 @@ function Highscores:sort(difficulty)
     self.highscores[difficulty] = A
 end
 
+function Highscores:reset(difficulty)
+    self.highscores[difficulty] = {}
+    self:save(difficulty)
+end
+
 -- This function compares the score part of a high scores entry, and returns
 -- -1, 0 or 1 depending on which score is higher.
 function Highscores.compareTables(table1, table2)
