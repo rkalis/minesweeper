@@ -26,42 +26,47 @@ end
 -- If the cell isn't a mine, this function counts the amount of mines there are
 -- in the adjacent cells. If there aren't any, it will call the checkNeighbours
 -- function for all adajcent tiles. It checks at the start whether a tile has 
--- already beenchecked to avoid an infinite loop. When flagged tiles are cleared
+-- already been checked to avoid an infinite loop. When flagged tiles are cleared
 -- in this way, the flags are properly removed, unless it is done to clear the 
 -- board at the end of the game.
 function Cell:checkNeighbours(index1, index2)
-    if self.mine == false then
-        if not (state == "endgame") then
-            if self.flagged == true then
-                self.flagged = false
-                totalFlags = totalFlags - 1
+    if self.mine == true then return end
+
+    -- Clears flag
+    -- TODO: Cell instance shouldn't know about global game state
+    if not (state == "endgame") then
+        if self.flagged == true then
+            self.flagged = false
+            totalFlags = totalFlags - 1
+        end
+    end
+
+    if self.checked == true then return end
+
+    -- Checks the amount of mines
+    for i = -1, 1 do
+        for j = -1, 1 do
+            if not (i == 0 and j == 0)
+            and (index1 + i >= 0 and index1 + i <= NUM_ROWS - 1)
+            and (index2 + j >= 0 and index2 + j <= NUM_COLS - 1) then
+                if board[index1 + i][index2 + j].mine == true then
+                    self.numMines = self.numMines + 1
+                end
             end
         end
-        if self.checked == false then
-            for i = -1, 1 do
-                for j = -1, 1 do
-                    if not (i == 0 and j == 0) 
-                    and (index1 + i >= 0 and index1 + i <= NUM_ROWS - 1)
-                    and (index2 + j >= 0 and index2 + j <= NUM_COLS - 1) then
-                        if board[index1 + i][index2 + j].mine == true then
-                            self.numMines = self.numMines + 1
-                        end
-                    end
-                end
-            end
-            self.checked = true
-            if self.numMines == 0 then
-                for i = -1, 1 do
-                    for j = -1, 1 do
-                        if not (i == 0 and j == 0)
-                        and (index1 + i >= 0 and index1 + i <= NUM_ROWS - 1)
-                        and (index2 + j >= 0 and index2 + j <= NUM_COLS - 1) 
-                        then
-                            board[index1 + i][index2 + j]:
-                            checkNeighbours(index1 + i, index2 + j)
-                        end
-                    end
-                end
+    end
+    self.checked = true
+
+    -- Calls the checkNeighbours function for all neighbours
+    if self.numMines > 0 then return end
+    for i = -1, 1 do
+        for j = -1, 1 do
+            if not (i == 0 and j == 0)
+            and (index1 + i >= 0 and index1 + i <= NUM_ROWS - 1)
+            and (index2 + j >= 0 and index2 + j <= NUM_COLS - 1)
+            then
+                board[index1 + i][index2 + j]:
+                checkNeighbours(index1 + i, index2 + j)
             end
         end
     end
