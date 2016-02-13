@@ -92,10 +92,11 @@ function Cell:draw()
     else
         if self.flagged == true then
             love.graphics.draw(assets.graphics.block.flag, self.x, self.y, 0, self.size / 120)
-        elseif (love.mouse.isDown(1) or love.mouse.isDown(2)) and 
+        elseif love.mouse.isDown(1) and 
            (love.mouse.getX() > self.x and love.mouse.getX() < self.x + self.size) and
            (love.mouse.getY() > self.y and love.mouse.getY() < self.y + self.size) then
             love.graphics.draw(assets.graphics.block[0], self.x, self.y, 0, self.size / 120)
+            drawSmiley("o", medium.x, medium.y)
         else
             love.graphics.draw(assets.graphics.block.unclicked, self.x, self.y, 0, self.size / 120)
         end

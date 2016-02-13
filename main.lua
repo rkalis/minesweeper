@@ -149,7 +149,28 @@ function checkWin()
     end
     return true
 end
-        
+
+function love.mousepressed(x, y, button)
+    if not(state == "play" or state == "firstmove") then return end
+    if y < STATS_HEIGHT then return end
+    -- The right button toggles whether the cell is flagged.
+    if button == 2 then
+        local index1 = math.floor((y - STATS_HEIGHT) / CELL_SIZE)
+        local index2 = math.floor(x / CELL_SIZE)
+        if  board[index1][index2].flagged == false 
+        and board[index1][index2].checked == false 
+        and board[index1][index2].clicked == false then
+            board[index1][index2].flagged = true
+            totalFlags = totalFlags + 1
+        elseif  board[index1][index2].flagged == true
+            and board[index1][index2].checked == false 
+            and board[index1][index2].clicked == false then
+            board[index1][index2].flagged = false
+            totalFlags = totalFlags - 1
+        end
+    end
+end
+
 -- I decided to use the love.mousereleased function instead of the
 -- love.mousepressed function because that makes more sense to me. Like that
 -- it is also possible to fix a mistake that was realised just in time.
@@ -208,19 +229,6 @@ function love.mousereleased(x, y, button)
                     if(checkWin() == true) then
                         state = "endgame"
                     end
-                end
-            -- The right button toggles whether the cell is flagged.
-            elseif button == 2 then
-                if  board[index1][index2].flagged == false 
-                and board[index1][index2].checked == false 
-                and board[index1][index2].clicked == false then
-                    board[index1][index2].flagged = true
-                    totalFlags = totalFlags + 1
-                elseif  board[index1][index2].flagged == true
-                    and board[index1][index2].checked == false 
-                    and board[index1][index2].clicked == false then
-                    board[index1][index2].flagged = false
-                    totalFlags = totalFlags - 1
                 end
             end
         -- If the smiley is clicked the game is reset.
@@ -287,12 +295,7 @@ function love.draw()
     if state == "play" or state == "firstmove" or state == "endgame" 
     or state == "highscoresEnter" or state == "highscoresDisplay" then
         love.graphics.setColor(255,255,255)
-        if (love.mouse.isDown(1) or love.mouse.isDown(2)) and
-           love.mouse.getY() > STATS_HEIGHT then
-            drawSmiley("o", medium.x, medium.y)
-        else
-            drawSmiley("def", medium.x, medium.y)
-        end
+        drawSmiley("def", medium.x, medium.y)
 
         love.graphics.setColor(0,0,0)
         love.graphics.setFont(font)
