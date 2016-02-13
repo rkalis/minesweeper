@@ -98,7 +98,7 @@ function Highscores:sort(difficulty)
         hasChanged = false
         itemCount = itemCount - 1
         for i = 1, itemCount do
-            if self.compareTables(A[i], A[i + 1]) == 1 then
+            if self.compareScore(A[i], A[i + 1]) == 1 then
                 A[i], A[i + 1] = A[i + 1], A[i]
                 hasChanged = true
             end
@@ -114,7 +114,7 @@ end
 
 -- This function compares the score part of a high scores entry, and returns
 -- -1, 0 or 1 depending on which score is higher.
-function Highscores.compareTables(table1, table2)
+function Highscores.compareScore(table1, table2)
     if table1[2] ~= nil and table2[2] ~= nil then
         if table1[2] < table2[2] then
             return -1
