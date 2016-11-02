@@ -25,9 +25,9 @@ end
 
 -- If the cell isn't a mine, this function counts the amount of mines there are
 -- in the adjacent cells. If there aren't any, it will call the checkNeighbours
--- function for all adajcent tiles. It checks at the start whether a tile has 
+-- function for all adajcent tiles. It checks at the start whether a tile has
 -- already been checked to avoid an infinite loop. When flagged tiles are cleared
--- in this way, the flags are properly removed, unless it is done to clear the 
+-- in this way, the flags are properly removed, unless it is done to clear the
 -- board at the end of the game.
 function Cell:checkNeighbours(index1, index2, clearFlags)
     if self.mine == true then self.checked = true; return end
@@ -92,11 +92,12 @@ function Cell:draw()
     else
         if self.flagged == true then
             love.graphics.draw(assets.graphics.block.flag, self.x, self.y, 0, self.size / 120)
-        elseif love.mouse.isDown(1) and 
+        -- TODO: This kind of breaks encapsulation
+        elseif love.mouse.isDown(1) and
            (love.mouse.getX() > self.x and love.mouse.getX() < self.x + self.size) and
            (love.mouse.getY() > self.y and love.mouse.getY() < self.y + self.size) then
             love.graphics.draw(assets.graphics.block[0], self.x, self.y, 0, self.size / 120)
-            drawSmiley("o", medium.x, medium.y)
+            buttons.medium.smiley = "o"
         else
             love.graphics.draw(assets.graphics.block.unclicked, self.x, self.y, 0, self.size / 120)
         end

@@ -20,7 +20,9 @@ local assets = {
             def = love.graphics.newImage("assets/graphics/smiley.png"),
             win = love.graphics.newImage("assets/graphics/smiley_win.png"),
             lose = love.graphics.newImage("assets/graphics/smiley_lose.png"),
-            o = love.graphics.newImage("assets/graphics/smiley_o.png")
+            o = love.graphics.newImage("assets/graphics/smiley_o.png"),
+            green = love.graphics.newImage("assets/graphics/smiley_green.png"),
+            red = love.graphics.newImage("assets/graphics/smiley_red.png")
         }
     },
     audio = {

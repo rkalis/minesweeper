@@ -5,10 +5,11 @@ Button = {
     y,
     width = 60,
     height = 60,
-    clicked = false
+    clicked = false,
+    smiley = "def"
 }
 
-function Button:new(x, y, name)
+function Button:new(x, y)
     obj = {
         x = x,
         y = y
@@ -16,4 +17,9 @@ function Button:new(x, y, name)
     setmetatable(obj, self)
     self.__index = self
     return obj
+end
+
+function Button:draw()
+    smiley = assets.graphics.smiley[self.smiley]
+    love.graphics.draw(smiley, self.x, self.y, 0, 1/2)
 end
