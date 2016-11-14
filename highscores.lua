@@ -36,7 +36,7 @@ end
 
 -- Loads 11 (the 10 saved from last time + the one from this time)
 -- from the highscoresFile to the corresponding highscores table.
--- If there aren't 11, it loads the ones there are. The high scores are 
+-- If there aren't 11, it loads the ones there are. The high scores are
 -- saved as a table with two variables, one for a name and one for a score.
 -- This table is saved in the highscores table.
 function Highscores:load(difficulty)
@@ -48,7 +48,7 @@ function Highscores:load(difficulty)
     end
 
     -- This saves the different variables in the file (seperated by a space)
-    -- to the highscores table as seperate variables within a table. 
+    -- to the highscores table as seperate variables within a table.
     for i = 1, 11 do
         if temp[i] ~= nil then
             index = 1
@@ -75,7 +75,7 @@ function Highscores:save(difficulty)
     -- Write to the empty file
     self.files[difficulty]:open("a")
     for i = 1, 10 do
-        if  self.highscores[difficulty][i] ~= nil 
+        if  self.highscores[difficulty][i] ~= nil
         and self.highscores[difficulty][i][1]
         and self.highscores[difficulty][i][2] then
             self.files[difficulty]:write(self.highscores[difficulty][i][1]
@@ -97,13 +97,13 @@ function Highscores:draw(difficulty)
     love.graphics.printf("HIGH SCORES:", WINDOW_WIDTH / 2 - 125,
                          WINDOW_HEIGHT / 2 - 190, 250, "center")
     for i = 1, 10 do
-        if self.highscores[difficulty][i] ~= nil 
+        if self.highscores[difficulty][i] ~= nil
         and self.highscores[difficulty][i][1] ~= nil
         and self.highscores[difficulty][i][2] ~= nil then
-            love.graphics.print(i, WINDOW_WIDTH / 2 - 110, 
+            love.graphics.print(i, WINDOW_WIDTH / 2 - 110,
                                    WINDOW_HEIGHT / 2 - 150 + i * 20)
-            love.graphics.print(highscores.highscores[difficulty][i][1], 
-                                WINDOW_WIDTH / 2 - 80, 
+            love.graphics.print(highscores.highscores[difficulty][i][1],
+                                WINDOW_WIDTH / 2 - 80,
                                 WINDOW_HEIGHT / 2 - 150 + i * 20)
             love.graphics.print(highscores.highscores[difficulty][i][2],
                                 WINDOW_WIDTH / 2 + 70,
@@ -150,4 +150,14 @@ function Highscores.compareScore(table1, table2)
             return 1
         end
     end
+end
+
+-- TODO: Make this more efficient
+function Highscores:addScore(difficulty, name, score)
+    self.files[difficulty]:open("a")
+    self.files[difficulty]:write(name .. " " .. math.floor(score) .. "\n")
+    self.files[difficulty]:close()
+    self:load(difficulty)
+    self:sort(difficulty)
+    self:save(difficulty)
 end
