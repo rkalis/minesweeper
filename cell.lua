@@ -29,18 +29,19 @@ end
 -- already been checked to avoid an infinite loop. When flagged tiles are cleared
 -- in this way, the flags are properly removed, unless it is done to clear the
 -- board at the end of the game.
-function Cell:checkNeighbours(index1, index2, clearFlags)
-    if self.mine == true then self.checked = true; return end
-
+function Cell:checkNeighbours(index1, index2, clear_flags)
     -- Clears flag
-    if clearFlags == true then
-        if self.flagged == true then
+    if clear_flags then
+        if self.flagged then
             self.flagged = false
-            totalFlags = totalFlags - 1
+            total_flags = total_flags - 1
         end
     end
 
-    if self.checked == true then return end
+    if self.mine or self.checked then
+        self.checked = true
+        return
+    end
 
     -- Checks the amount of mines
     for i = -1, 1 do
@@ -65,7 +66,7 @@ function Cell:checkNeighbours(index1, index2, clearFlags)
             and (index2 + j >= 0 and index2 + j <= NUM_COLS - 1)
             then
                 board[index1 + i][index2 + j]:
-                checkNeighbours(index1 + i, index2 + j)
+                checkNeighbours(index1 + i, index2 + j, clear_flags)
             end
         end
     end
