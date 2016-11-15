@@ -8,7 +8,7 @@ Cell = {
     size = CELL_SIZE,
     clicked = false,
     mine = false,
-    numMines = 0,
+    neighbouring_mines = 0,
     checked = false,
     flagged = false
 }
@@ -29,7 +29,7 @@ end
 -- already been checked to avoid an infinite loop. When flagged tiles are cleared
 -- in this way, the flags are properly removed, unless it is done to clear the
 -- board at the end of the game.
-function Cell:checkNeighbours(index1, index2, clear_flags)
+function Cell:checkNeighbours(cell_x, cell_y, clear_flags)
     -- Clears flag
     if clear_flags then
         if self.flagged then
@@ -47,10 +47,10 @@ function Cell:checkNeighbours(index1, index2, clear_flags)
     for i = -1, 1 do
         for j = -1, 1 do
             if not (i == 0 and j == 0)
-            and (index1 + i >= 0 and index1 + i <= NUM_ROWS - 1)
-            and (index2 + j >= 0 and index2 + j <= NUM_COLS - 1) then
-                if board[index1 + i][index2 + j].mine == true then
-                    self.numMines = self.numMines + 1
+            and (cell_x + i >= 0 and cell_x + i <= NUM_ROWS - 1)
+            and (cell_y + j >= 0 and cell_y + j <= NUM_COLS - 1) then
+                if board[cell_x + i][cell_y + j].mine then
+                    self.neighbouring_mines = self.neighbouring_mines + 1
                 end
             end
         end
@@ -58,18 +58,21 @@ function Cell:checkNeighbours(index1, index2, clear_flags)
     self.checked = true
 
     -- Calls the checkNeighbours function for all neighbours
-    if self.numMines > 0 then return end
+    if self.neighbouring_mines > 0 then return end
     for i = -1, 1 do
         for j = -1, 1 do
             if not (i == 0 and j == 0)
-            and (index1 + i >= 0 and index1 + i <= NUM_ROWS - 1)
-            and (index2 + j >= 0 and index2 + j <= NUM_COLS - 1)
-            then
-                board[index1 + i][index2 + j]:
-                checkNeighbours(index1 + i, index2 + j, clear_flags)
+            and (cell_x + i >= 0 and cell_x + i <= NUM_ROWS - 1)
+            and (cell_y + j >= 0 and cell_y + j <= NUM_COLS - 1) then
+                board[cell_x + i][cell_y + j]:
+                checkNeighbours(cell_x + i, cell_y + j, clear_flags)
             end
         end
     end
+end
+
+function Cell:drawSprite(sprite)
+    love.graphics.draw(sprite, self.x, self.y, 0, self.size / 120)
 end
 
 -- This function displays a cell depending on the state it is in.
@@ -78,29 +81,29 @@ end
 function Cell:draw()
     love.graphics.setColor(255,255,255)
     -- If it's being clicked, display the clicked sprite
-    if self.checked == true then
-        if self.mine == true then
-            if self.clicked == true then
-                love.graphics.draw(assets.graphics.block.bomb_clicked, self.x, self.y, 0, self.size / 120)
+    if self.checked then
+        if self.mine then
+            if self.clicked then
+                self:drawSprite(assets.graphics.block.bomb_clicked)
             else
-                love.graphics.draw(assets.graphics.block.bomb, self.x, self.y, 0, self.size / 120)
+                self:drawSprite(assets.graphics.block.bomb)
             end
-        elseif self.flagged == true then
-            love.graphics.draw(assets.graphics.block.bomb_wrong, self.x, self.y, 0, self.size / 120)
+        elseif self.flagged then
+            self:drawSprite(assets.graphics.block.bomb_wrong)
         else
-            love.graphics.draw(assets.graphics.block[self.numMines], self.x, self.y, 0, self.size / 120)
+            self:drawSprite(assets.graphics.block[self.neighbouring_mines])
         end
     else
-        if self.flagged == true then
-            love.graphics.draw(assets.graphics.block.flag, self.x, self.y, 0, self.size / 120)
-        -- TODO: This kind of breaks encapsulation
+        if self.flagged then
+            self:drawSprite(assets.graphics.block.flag)
         elseif love.mouse.isDown(1) and
            (love.mouse.getX() > self.x and love.mouse.getX() < self.x + self.size) and
            (love.mouse.getY() > self.y and love.mouse.getY() < self.y + self.size) then
-            love.graphics.draw(assets.graphics.block[0], self.x, self.y, 0, self.size / 120)
+            self:drawSprite(assets.graphics.block[0])
+            -- TODO: This kind of breaks encapsulation
             buttons.medium.smiley = "o"
         else
-            love.graphics.draw(assets.graphics.block.unclicked, self.x, self.y, 0, self.size / 120)
+            self:drawSprite(assets.graphics.block.unclicked)
         end
     end
     love.graphics.setColor(100,100,100)

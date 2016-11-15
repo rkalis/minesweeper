@@ -48,19 +48,21 @@ require("highscores")
 -- with cell objects for every cell on the game board.
 -- Lastly the state is set to menu.
 function love.load()
-    totalFlags = 0
+    total_flags = 0
+    total_mines = 0
+
     outcome = "win"
     font = love.graphics.newFont(15)
     ended = false
-    startTime = 0
+    start_time = 0
     score = 0
-    minesPercentage = 17
     input = ""
     time = 0
     difficulty = "medium"
 
     love.graphics.setBackgroundColor(170,170,170)
 
+    -- Create highscores
     highscores = Highscores:new("highscores_easy.txt",
                                 "highscores_medium.txt",
                                 "highscores_hard.txt")
@@ -114,22 +116,23 @@ end
 -- board table. It only places a mine in a cell that doesn't already contain
 -- a mine. It also doesn't place any mines in the cell or adjacent cells to
 -- the cell of which coordinates are passed.
-function setMines(index1, index2)
+function placeMines(click_x, click_y)
     -- Seeding the random with os.time(), then a few math.random()s are
     -- executed because I read that the first few aren't completely
     -- random, so you should do it like this.
     math.randomseed(os.time())
     math.random(); math.random(); math.random(); math.random();
-    for i = 1, totalMines do
-        while true do
-            random1 = math.random(0, NUM_ROWS - 1)
-            random2 = math.random(0, NUM_COLS - 1)
-            if board[random1][random2].mine == false
-            and not ((random1 >= index1 - 1 and random1 <= index1 + 1)
-            and  (random2 >= index2 - 1 and random2 <= index2 + 1)) then
-                board[random1][random2].mine = true
-                break
-            end
+    mines_placed = 0
+    while mines_placed < total_mines do
+        -- Get random coordinates
+        random_x = math.random(0, NUM_ROWS - 1)
+        random_y = math.random(0, NUM_COLS - 1)
+
+        if board[random_x][random_y].mine == false
+        and not ((random_x >= click_x - 1 and random_x <= click_x + 1)
+        and  (random_y >= click_y - 1 and random_y <= click_y + 1)) then
+            board[random_x][random_y].mine = true
+            mines_placed = mines_placed + 1
         end
     end
 end
@@ -159,18 +162,17 @@ function love.mousepressed(x, y, button)
     if y < STATS_HEIGHT then return end
     -- The right button toggles whether the cell is flagged.
     if button == 2 then
-        local index1 = math.floor((y - STATS_HEIGHT) / CELL_SIZE)
-        local index2 = math.floor(x / CELL_SIZE)
-        if  board[index1][index2].flagged == false
-        and board[index1][index2].checked == false
-        and board[index1][index2].clicked == false then
-            board[index1][index2].flagged = true
-            totalFlags = totalFlags + 1
-        elseif  board[index1][index2].flagged == true
-            and board[index1][index2].checked == false
-            and board[index1][index2].clicked == false then
-            board[index1][index2].flagged = false
-            totalFlags = totalFlags - 1
+        local clicked_x = math.floor((y - STATS_HEIGHT) / CELL_SIZE)
+        local clicked_y = math.floor(x / CELL_SIZE)
+        cell = board[clicked_x][clicked_y]
+
+        -- TODO: When clearing a flagged cell, total flags is not decremented
+        if not cell.flagged and not (cell.checked or cell.clicked) then
+            cell.flagged = true
+            total_flags = total_flags + 1
+        elseif cell.flagged and not (cell.checked or cell.clicked) then
+            cell.flagged = false
+            total_flags = total_flags - 1
         end
     end
 end
@@ -187,13 +189,14 @@ function love.mousereleased(x, y, button)
     if state == "menu" then
         -- If one of the three buttons are pressed, the number of mines is
         -- determined and the state changes to firstmove.
+        -- TODO: Conflicting name with param, bad style
         for option, button in pairs(buttons) do
             if  (x > button.x and x < button.x + button.width)
             and (y > button.y and y < button.y + button.height) then
-                if option == "easy" then minesPercentage = 11
-                elseif option == "medium" then minesPercentage = 17
-                elseif option == "hard" then minesPercentage = 23 end
-                totalMines = math.ceil(minesPercentage / 100 * NUM_COLS * NUM_ROWS)
+                if option == "easy" then mines_percentage = 11
+                elseif option == "medium" then mines_percentage = 17
+                elseif option == "hard" then mines_percentage = 23 end
+                total_mines = math.ceil(mines_percentage / 100 * NUM_COLS * NUM_ROWS)
 
                 difficulty = option
 
@@ -210,26 +213,27 @@ function love.mousereleased(x, y, button)
 
             -- This translates the coordinates into indices for the
             -- board table.
-            local index1 = math.floor((y - STATS_HEIGHT) / CELL_SIZE)
-            local index2 = math.floor(x / CELL_SIZE)
+            local clicked_x = math.floor((y - STATS_HEIGHT) / CELL_SIZE)
+            local clicked_y = math.floor(x / CELL_SIZE)
+            cell = board[clicked_x][clicked_y]
 
             if button == 1 then
-                if board[index1][index2].flagged == false then
-                    board[index1][index2].clicked = true
-                    if board[index1][index2].mine == true then
+                if not cell.flagged then
+                    cell.clicked = true
+                    if cell.mine then
                         outcome = "lose"
                         state = "endgame"
                     end
                     if state == "firstmove" then
-                        setMines(index1, index2)
-                        startTime = love.timer.getTime()
+                        placeMines(clicked_x, clicked_y)
+                        start_time = love.timer.getTime()
                         state = "play"
                     end
-                    board[index1][index2]:checkNeighbours(index1, index2, true)
+                    cell:checkNeighbours(clicked_x, clicked_y, true)
 
                     -- It is checked after each left click whether this click
                     -- has caused victory.
-                    if(checkWin() == true) then
+                    if(checkWin()) then
                         state = "endgame"
                     end
                 end
@@ -269,16 +273,8 @@ function love.keypressed(key)
         elseif key == "return" then
             if input ~= "" then
                 name = input
-
-                highscores.files[difficulty]:open("a")
-                highscores.files[difficulty]:write(name .. " "
-                                                 .. math.floor(score) .. "\n")
-                highscores.files[difficulty]:close()
-
+                highscores:addScore(difficulty, name, score)
             end
-            highscores:load(difficulty)
-            highscores:sort(difficulty)
-            highscores:save(difficulty)
             state = "highscoresDisplay"
         end
     end
@@ -301,7 +297,7 @@ function love.draw()
         love.graphics.setColor(0,0,0)
         love.graphics.setFont(font)
 
-        love.graphics.printf("Mines remaining: " .. (totalMines - totalFlags),
+        love.graphics.printf("Mines remaining: " .. (total_mines - total_flags),
                              WINDOW_WIDTH / 2 + 35, STATS_HEIGHT / 2,
                              WINDOW_WIDTH / 2 - 40, "center")
 
@@ -323,7 +319,7 @@ function love.draw()
 
     -- The game board:
 
-    -- Draws the standard board if the state is not endgame.
+    -- Draws the standard board
     if state == "play" or state == "menu" or
        state == "firstmove" or state == "endgame" or
        state == "highscoresEnter" or state == "highscoresDisplay" then
@@ -333,7 +329,7 @@ function love.draw()
             end
         end
     end
-    -- Draws the fully revealed board at the end of the game.
+    -- Draws the smiley that corresponds with the outcome
     if state == "endgame" then
         buttons.medium.smiley = outcome
     end

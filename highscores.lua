@@ -11,6 +11,8 @@ Highscores = {
     }
 }
 
+-- Creates new highscores at the given files, creating the files if they
+-- didn't exist already
 function Highscores:new(easy_fn, medium_fn, hard_fn)
     -- Creates high score files if the don't alreasy exist
     if not(love.filesystem.exists(easy_fn)) then
@@ -50,8 +52,8 @@ function Highscores:load(difficulty)
     -- This saves the different variables in the file (seperated by a space)
     -- to the highscores table as seperate variables within a table.
     for i = 1, 11 do
-        if temp[i] ~= nil then
-            index = 1
+        if temp[i] then
+            local index = 1
             self.highscores[difficulty][i] = {}
             for entry in string.gmatch(temp[i], "(%w+)") do
                 if index == 2 then
@@ -75,17 +77,19 @@ function Highscores:save(difficulty)
     -- Write to the empty file
     self.files[difficulty]:open("a")
     for i = 1, 10 do
-        if  self.highscores[difficulty][i] ~= nil
+        if  self.highscores[difficulty][i]
         and self.highscores[difficulty][i][1]
         and self.highscores[difficulty][i][2] then
-            self.files[difficulty]:write(self.highscores[difficulty][i][1]
-                                        .. " " .. self.highscores[difficulty][i][2]
-                                        .. "\n")
+            local name = self.highscores[difficulty][i][1]
+            local score = self.highscores[difficulty][i][2]
+            self.files[difficulty]:write(name .. " " .. score .. "\n")
         end
     end
     self.files[difficulty]:close()
 end
 
+
+-- TODO: Make this more dynamic
 function Highscores:draw(difficulty)
     love.graphics.setColor(0,0,0)
     love.graphics.rectangle("line", WINDOW_WIDTH / 2 - 125,
@@ -97,9 +101,9 @@ function Highscores:draw(difficulty)
     love.graphics.printf("HIGH SCORES:", WINDOW_WIDTH / 2 - 125,
                          WINDOW_HEIGHT / 2 - 190, 250, "center")
     for i = 1, 10 do
-        if self.highscores[difficulty][i] ~= nil
-        and self.highscores[difficulty][i][1] ~= nil
-        and self.highscores[difficulty][i][2] ~= nil then
+        if  self.highscores[difficulty][i]
+        and self.highscores[difficulty][i][1]
+        and self.highscores[difficulty][i][2] then
             love.graphics.print(i, WINDOW_WIDTH / 2 - 110,
                                    WINDOW_HEIGHT / 2 - 150 + i * 20)
             love.graphics.print(highscores.highscores[difficulty][i][1],
@@ -117,22 +121,23 @@ end
 -- Edited to work with the highscores table by using the compareTables
 -- function.
 function Highscores:sort(difficulty)
-    local A = self.highscores[difficulty]
-    local itemCount = #A
-    local hasChanged
+    local highscores = self.highscores[difficulty]
+    local item_count = #highscores
+    local has_changed
     repeat
-        hasChanged = false
-        itemCount = itemCount - 1
-        for i = 1, itemCount do
-            if self.compareScore(A[i], A[i + 1]) == 1 then
-                A[i], A[i + 1] = A[i + 1], A[i]
-                hasChanged = true
+        has_changed = false
+        item_count = item_count - 1
+        for i = 1, item_count do
+            if self.compareScore(highscores[i], highscores[i + 1]) == 1 then
+                highscores[i], highscores[i + 1] = highscores[i + 1], highscores[i]
+                has_changed = true
             end
         end
-    until hasChanged == false
-    self.highscores[difficulty] = A
+    until not has_changed
+    self.highscores[difficulty] = highscores
 end
 
+-- This resets the highscores of the given difficulty
 function Highscores:reset(difficulty)
     self.highscores[difficulty] = {}
     self:save(difficulty)
@@ -140,13 +145,13 @@ end
 
 -- This function compares the score part of a high scores entry, and returns
 -- -1, 0 or 1 depending on which score is higher.
-function Highscores.compareScore(table1, table2)
-    if table1[2] ~= nil and table2[2] ~= nil then
-        if table1[2] < table2[2] then
+function Highscores.compareScore(score1, score2)
+    if score1[2] ~= nil and score2[2] ~= nil then
+        if score1[2] < score2[2] then
             return -1
-        elseif table1[2] == table2[2] then
+        elseif score1[2] == score2[2] then
             return 0
-        elseif table1[2] > table2[2] then
+        elseif score1[2] > score2[2] then
             return 1
         end
     end
