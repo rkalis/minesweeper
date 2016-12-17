@@ -32,7 +32,17 @@
 -- * All graphics and sound effects were made by me.
 
 assets = require("assets")
+Gamestate = require("lib/gamestate")
+utils = require("lib/utils")
+states = {
+    menu = require("states/menu"),
+    preGame = require("states/preGame")
+}
+
+UI = require "UI"
+
 require("cell")
+require("board")
 require("button")
 require("highscores")
 
@@ -58,24 +68,11 @@ function love.load()
                                 "highscores_medium.txt",
                                 "highscores_hard.txt")
 
-    -- Button initialisation
-    buttons = {
-        easy   = Button:new(WINDOW_WIDTH * 1/4 - 30, 20),
-        medium = Button:new(WINDOW_WIDTH * 1/2 - 30, 20),
-        hard   = Button:new(WINDOW_WIDTH * 3/4 - 30, 20)
-    }
-    buttons.easy.smiley = "green"
-    buttons.hard.smiley = "red"
-
     -- Cells initialisattion
-    board = {}
-    for i = 0, NUM_ROWS - 1 do
-        board[i] = {}
-        for j = 0, NUM_COLS - 1 do
-            board[i][j] = Cell:new(j * CELL_SIZE, i * CELL_SIZE + STATS_HEIGHT)
-        end
-    end
+    board = Board:new(NUM_COLS, NUM_ROWS, CELL_SIZE, STATS_HEIGHT)
 
+    Gamestate.registerEvents()
+    Gamestate.switch(states.menu)
     state = "menu"
 end
 
@@ -92,7 +89,7 @@ function love.update(dt)
         time = time + dt
         for i = 0, NUM_ROWS - 1 do
             for j = 0, NUM_COLS - 1 do
-                board[i][j]:checkNeighbours(i, j, false)
+                board[i][j]:checkNeighbours(false)
             end
         end
         if outcome == "win" then
@@ -131,8 +128,8 @@ function reset()
 end
 
 function checkWin()
-    for _, row in pairs(board) do
-        for _, cell in pairs(row) do
+    for _, row in utils.ipairs(board) do
+        for _, cell in utils.ipairs(row) do
             if not (cell.mine or cell.checked) then
                 return false
             end
@@ -161,27 +158,7 @@ function love.mousepressed(x, y, button)
 end
 
 function love.mousereleased(x, y, button)
-    if state == "menu" then
-        -- If one of the three buttons are pressed, the number of mines is
-        -- determined and the state changes to firstmove.
-        -- TODO: Conflicting name with param, bad style
-        for option, button in pairs(buttons) do
-            if button:isClicked(x, y) then
-                if option == "easy" then mines_percentage = 11
-                elseif option == "medium" then mines_percentage = 17
-                elseif option == "hard" then mines_percentage = 23 end
-                total_mines = math.ceil(mines_percentage / 100 * NUM_COLS * NUM_ROWS)
-
-                difficulty = option
-
-                buttons.easy = nil
-                buttons.hard = nil
-
-                state = "firstmove"
-            end
-        end
-
-    elseif state == "play" or state == "firstmove" then
+    if state == "play" or state == "firstmove" then
         -- If the coordinates are outside of the stats bar
         if y > STATS_HEIGHT then
 
@@ -203,11 +180,11 @@ function love.mousereleased(x, y, button)
                         start_time = love.timer.getTime()
                         state = "play"
                     end
-                    cell:checkNeighbours(clicked_x, clicked_y, true)
+                    cell:checkNeighbours(true)
 
                     -- It is checked after each left click whether this click
                     -- has caused victory.
-                    if(checkWin()) then
+                    if checkWin() then
                         state = "endgame"
                     end
                 end
@@ -275,28 +252,15 @@ function love.draw()
 
         love.graphics.print("Time: " .. (math.floor(score)),
                             WINDOW_WIDTH * 1/5 - 20, STATS_HEIGHT / 2)
-
-    -- The stats bar when the game is in menu.
-    -- It includes three buttons for each difficulty.
-    elseif state == "menu" then
-        love.graphics.setColor(255,255,255)
-        for option, button in pairs(buttons) do
-            button:draw()
-        end
     end
-
-    -- The game board:
 
     -- Draws the standard board
-    if state == "play" or state == "menu" or
-       state == "firstmove" or state == "endgame" or
-       state == "highscoresEnter" or state == "highscoresDisplay" then
-        for _, row in pairs(board) do
-            for _, cell in pairs(row) do
-                cell:draw()
-            end
+    for _, row in utils.ipairs(board) do
+        for _, cell in utils.ipairs(row) do
+            cell:draw()
         end
     end
+
     -- Draws the smiley that corresponds with the outcome
     if state == "endgame" then
         buttons.medium.smiley = outcome

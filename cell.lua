@@ -29,7 +29,7 @@ end
 -- already been checked to avoid an infinite loop. When flagged tiles are cleared
 -- in this way, the flags are properly removed, unless it is done to clear the
 -- board at the end of the game.
-function Cell:checkNeighbours(cell_x, cell_y, clear_flags)
+function Cell:checkNeighbours(clear_flags)
     -- Clears flag
     if clear_flags then
         if self.flagged then
@@ -44,32 +44,42 @@ function Cell:checkNeighbours(cell_x, cell_y, clear_flags)
     end
 
     -- Checks the amount of mines
-    for i = -1, 1 do
-        for j = -1, 1 do
-            if not (i == 0 and j == 0)
-            and (cell_x + i >= 0 and cell_x + i <= NUM_ROWS - 1)
-            and (cell_y + j >= 0 and cell_y + j <= NUM_COLS - 1) then
-                if board[cell_x + i][cell_y + j].mine then
-                    self.neighbouring_mines = self.neighbouring_mines + 1
-                end
-            end
+    for _, neighbour in ipairs(self.neighbours) do
+        if neighbour.mine then
+            self.neighbouring_mines = self.neighbouring_mines + 1
         end
     end
     self.checked = true
 
     -- Calls the checkNeighbours function for all neighbours
     if self.neighbouring_mines > 0 then return end
-    for i = -1, 1 do
-        for j = -1, 1 do
-            if not (i == 0 and j == 0)
-            and (cell_x + i >= 0 and cell_x + i <= NUM_ROWS - 1)
-            and (cell_y + j >= 0 and cell_y + j <= NUM_COLS - 1) then
-                board[cell_x + i][cell_y + j]:
-                checkNeighbours(cell_x + i, cell_y + j, clear_flags)
-            end
-        end
+    for _, neighbour in ipairs(self.neighbours) do
+        neighbour:checkNeighbours(clear_flags)
+    end
+
+end
+
+function Cell:toggleFlag()
+    if not self.flagged and not (self.checked or self.clicked) then
+        self.flagged = true
+        total_flags = total_flags + 1
+    elseif self.flagged and not (self.checked or self.clicked) then
+        self.flagged = false
+        total_flags = total_flags - 1
     end
 end
+
+function Cell:click()
+    if not self.flagged then
+        self.clicked = true
+        if self.mine then
+            return false
+        end
+        self:checkNeighbours(true)
+    end
+    return true
+end
+
 
 function Cell:drawSprite(sprite)
     love.graphics.draw(sprite, self.x, self.y, 0, self.size / 120)
