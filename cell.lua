@@ -14,7 +14,7 @@ Cell = {
 }
 
 function Cell:new(x, y)
-    obj = {
+    local obj = {
         x = x,
         y = y,
     }
