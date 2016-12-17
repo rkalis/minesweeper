@@ -1,9 +1,9 @@
 -- LuaSweeper/main.lua
 
 -- * This application runs my personal version of the famous game Minesweeper.
--- * At the start the user is asked to select a difficulty. Based on this
+-- * At the start the user can select a difficulty. Based on this
 --   selection the total number of mines will be determined.
--- * A user then starts the game and the timer by cl[icking a cell on the field.
+-- * A user then starts the game and the timer by clicking a cell on the field.
 -- * A number of cells will be selected to be mines at random, but they can not
 --   be the initially clicked cell or any of its neighbours.
 -- * If a cell is right clicked, the cell will be flagged, marking it as a mine,
@@ -29,30 +29,20 @@
 --   It is already possible to do this through the conf.lua file, but it would
 --   be nice to add end-user support for this. A man can only do so much in a
 --   week though.
--- * All graphics and sound effects except for the button template were made by
---   me. I can't remember where I found the button template, but that is hardly
---   plagiarism.
+-- * All graphics and sound effects were made by me.
 
 assets = require("assets")
 require("cell")
 require("button")
 require("highscores")
 
--- The love.load function is called at the start of the game.
--- In this function some variables are initialised.
--- The title and the background colour are set.
--- Graphics as well as audio are saved for use in the application,
--- grouped in tables.
--- File objects are created for the highscore files.
--- Button objects are created and a two-dimensional table is created and filled
--- with cell objects for every cell on the game board.
--- Lastly the state is set to menu.
+-- This is the entrypoint of the code, here variables are initialised and the
+-- initial state is set
 function love.load()
+    -- Variable initialisation
     total_flags = 0
     total_mines = 0
-
     outcome = "win"
-    font = love.graphics.newFont(15)
     ended = false
     start_time = 0
     score = 0
@@ -60,9 +50,10 @@ function love.load()
     time = 0
     difficulty = "medium"
 
+    font = love.graphics.newFont(15)
     love.graphics.setBackgroundColor(170,170,170)
 
-    -- Create highscores
+    -- Highscores initialisation
     highscores = Highscores:new("highscores_easy.txt",
                                 "highscores_medium.txt",
                                 "highscores_hard.txt")
@@ -88,9 +79,9 @@ function love.load()
     state = "menu"
 end
 
--- love.update function is called continuously during the game. I used it
--- mainly for time related events since it lends itself very well for these
--- kind of operations as it passes a delta time variable.
+-- love.update function is called continuously during the game. This is where
+-- the main game logic is executed in combination with the event functions
+-- (e.g. mousepressed, keypressed)
 function love.update(dt)
     if state == "play" then
         score = score + dt
@@ -113,15 +104,13 @@ function love.update(dt)
 end
 
 -- This function places a fixed amount of mines at random places in the
--- board table. It only places a mine in a cell that doesn't already contain
--- a mine. It also doesn't place any mines in the cell or adjacent cells to
--- the cell of which coordinates are passed.
+-- board table. It doesn't place any mines in the clicked cell or adjacent
+-- cells to the clicked cell.
 function placeMines(click_x, click_y)
-    -- Seeding the random with os.time(), then a few math.random()s are
-    -- executed because I read that the first few aren't completely
-    -- random, so you should do it like this.
+    -- Random seed with a few calibration randoms
     math.randomseed(os.time())
     math.random(); math.random(); math.random(); math.random();
+
     mines_placed = 0
     while mines_placed < total_mines do
         -- Get random coordinates
@@ -130,26 +119,21 @@ function placeMines(click_x, click_y)
 
         if board[random_x][random_y].mine == false
         and not ((random_x >= click_x - 1 and random_x <= click_x + 1)
-        and  (random_y >= click_y - 1 and random_y <= click_y + 1)) then
+             and (random_y >= click_y - 1 and random_y <= click_y + 1)) then
             board[random_x][random_y].mine = true
             mines_placed = mines_placed + 1
         end
     end
 end
 
--- This function resets the game by calling the love.load fucntion.
 function reset()
     love.load()
 end
 
--- This function checks whether the game is won by checking if there are
--- cells left that aren't either a mine or checked. If none are found, the
--- game is won.
 function checkWin()
-    for i = 0, NUM_ROWS - 1 do
-        for j = 0, NUM_COLS - 1 do
-            if board[i][j].mine == true or board[i][j].checked == true then
-            else
+    for _, row in pairs(board) do
+        for _, cell in pairs(row) do
+            if not (cell.mine or cell.checked) then
                 return false
             end
         end
@@ -166,7 +150,6 @@ function love.mousepressed(x, y, button)
         local clicked_y = math.floor(x / CELL_SIZE)
         cell = board[clicked_x][clicked_y]
 
-        -- TODO: When clearing a flagged cell, total flags is not decremented
         if not cell.flagged and not (cell.checked or cell.clicked) then
             cell.flagged = true
             total_flags = total_flags + 1
@@ -177,22 +160,13 @@ function love.mousepressed(x, y, button)
     end
 end
 
--- I decided to use the love.mousereleased function instead of the
--- love.mousepressed function because that makes more sense to me. Like that
--- it is also possible to fix a mistake that was realised just in time.
--- Depending on the state there are different clickable areas with different
--- on-release effects. In the menu there are three difficulty buttons.
--- In the endgame only the reset smiley is clickable, in all other states the
--- game board is clickable, but in the menu, clicking the board has no
--- effect.
 function love.mousereleased(x, y, button)
     if state == "menu" then
         -- If one of the three buttons are pressed, the number of mines is
         -- determined and the state changes to firstmove.
         -- TODO: Conflicting name with param, bad style
         for option, button in pairs(buttons) do
-            if  (x > button.x and x < button.x + button.width)
-            and (y > button.y and y < button.y + button.height) then
+            if button:isClicked(x, y) then
                 if option == "easy" then mines_percentage = 11
                 elseif option == "medium" then mines_percentage = 17
                 elseif option == "hard" then mines_percentage = 23 end
@@ -239,15 +213,13 @@ function love.mousereleased(x, y, button)
                 end
             end
         -- If the smiley is clicked the game is reset.
-        elseif  (x > buttons.medium.x and x < buttons.medium.x + buttons.medium.width)
-            and (y > buttons.medium.y and y < buttons.medium.y + buttons.medium.height) then
+        elseif buttons.medium:isClicked(x, y) then
             reset()
         end
     -- If the smiley is clicked the game is reset.
     elseif state == "endgame" or state == "highscoresEnter"
         or state == "highscoresDisplay" then
-            if  (x > buttons.medium.x and x < buttons.medium.x + buttons.medium.width)
-            and (y > buttons.medium.y and y < buttons.medium.y + buttons.medium.height) then
+        if buttons.medium:isClicked(x, y) then
             reset()
         end
     end
@@ -301,13 +273,9 @@ function love.draw()
                              WINDOW_WIDTH / 2 + 35, STATS_HEIGHT / 2,
                              WINDOW_WIDTH / 2 - 40, "center")
 
-        if state == "firstmove" then
-            love.graphics.print("Time: 0", WINDOW_WIDTH * 1/5 - 20,
-                                STATS_HEIGHT / 2)
-        else
-            love.graphics.print("Time: " .. (math.floor(score)),
-                                WINDOW_WIDTH * 1/5 - 20, STATS_HEIGHT / 2)
-        end
+        love.graphics.print("Time: " .. (math.floor(score)),
+                            WINDOW_WIDTH * 1/5 - 20, STATS_HEIGHT / 2)
+
     -- The stats bar when the game is in menu.
     -- It includes three buttons for each difficulty.
     elseif state == "menu" then
@@ -323,9 +291,9 @@ function love.draw()
     if state == "play" or state == "menu" or
        state == "firstmove" or state == "endgame" or
        state == "highscoresEnter" or state == "highscoresDisplay" then
-        for i = 0, NUM_ROWS - 1 do
-            for j = 0, NUM_COLS - 1 do
-                board[i][j]:draw()
+        for _, row in pairs(board) do
+            for _, cell in pairs(row) do
+                cell:draw()
             end
         end
     end

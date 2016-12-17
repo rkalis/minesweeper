@@ -15,18 +15,18 @@ Highscores = {
 -- didn't exist already
 function Highscores:new(easy_fn, medium_fn, hard_fn)
     -- Creates high score files if the don't alreasy exist
-    if not(love.filesystem.exists(easy_fn)) then
+    if not love.filesystem.exists(easy_fn) then
         love.filesystem.write(easy_fn, "")
     end
-    if not(love.filesystem.exists(medium_fn)) then
+    if not love.filesystem.exists(medium_fn) then
         love.filesystem.write(medium_fn, "")
     end
-    if not(love.filesystem.exists(hard_fn)) then
+    if not love.filesystem.exists(hard_fn) then
         love.filesystem.write(hard_fn, "")
     end
     obj = {
         files = {
-            easy = love.filesystem.newFile(easy_fn),
+            easy   = love.filesystem.newFile(easy_fn),
             medium = love.filesystem.newFile(medium_fn),
             hard   = love.filesystem.newFile(hard_fn)
         }
