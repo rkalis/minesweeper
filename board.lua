@@ -40,13 +40,37 @@ function Board:new(width, height, cell_size, start_of_board)
     return obj
 end
 
-function Board:mouseCoordsToCell(mouse_x, mouse_y)
-    local clicked_x, clicked_y = self:mouseCoordsToBoard(mouse_x, mouse_y)
-    if not clicked_x or not clicked_y then return nil end
-    return board[clicked_y][clicked_x]
+-- This function places a fixed amount of mines at random places in the
+-- board table. It doesn't place any mines in the clicked cell or adjacent
+-- cells to the clicked cell.
+function Board:placeMines(clicked_cell, total_mines)
+    local mines_placed = 0
+    while mines_placed < total_mines do
+        local random_cell = self:getRandomCell()
+
+        if not random_cell.mine and not random_cell:equals(clicked_cell) and
+           not random_cell:isNeighbour(clicked_cell) then
+            random_cell.mine = true
+            mines_placed = mines_placed + 1
+        end
+    end
 end
 
-function Board:mouseCoordsToBoard(mouse_x, mouse_y)
+function Board:getCell(x, y)
+    if not x or not y then return nil end
+    return self[y][x]
+end
+
+function Board:getRandomCell()
+    local random_row = self[math.random(0, #self)]
+    return random_row[math.random(0, #random_row)]
+end
+
+function Board:mouseToCell(mouse_x, mouse_y)
+    return self:getCell(self:mouseToBoard(mouse_x, mouse_y))
+end
+
+function Board:mouseToBoard(mouse_x, mouse_y)
     if mouse_y < self.start_of_board then return nil end
     local clicked_y = math.floor((mouse_y - self.start_of_board) / self.cell_size)
     local clicked_x = math.floor(mouse_x / self.cell_size)

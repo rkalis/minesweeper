@@ -49,6 +49,10 @@ require("highscores")
 -- This is the entrypoint of the code, here variables are initialised and the
 -- initial state is set
 function love.load()
+    -- Random seed with a few calibration randoms
+    math.randomseed(os.time())
+    math.random(); math.random(); math.random(); math.random();
+
     -- Variable initialisation
     total_flags = 0
     total_mines = 0
@@ -96,29 +100,6 @@ function love.update(dt)
             if time >= 3 then
                 state = "highscoresEnter"
             end
-        end
-    end
-end
-
--- This function places a fixed amount of mines at random places in the
--- board table. It doesn't place any mines in the clicked cell or adjacent
--- cells to the clicked cell.
-function placeMines(click_x, click_y)
-    -- Random seed with a few calibration randoms
-    math.randomseed(os.time())
-    math.random(); math.random(); math.random(); math.random();
-
-    mines_placed = 0
-    while mines_placed < total_mines do
-        -- Get random coordinates
-        random_x = math.random(0, NUM_ROWS - 1)
-        random_y = math.random(0, NUM_COLS - 1)
-
-        if board[random_x][random_y].mine == false
-        and not ((random_x >= click_x - 1 and random_x <= click_x + 1)
-             and (random_y >= click_y - 1 and random_y <= click_y + 1)) then
-            board[random_x][random_y].mine = true
-            mines_placed = mines_placed + 1
         end
     end
 end
@@ -176,7 +157,7 @@ function love.mousereleased(x, y, button)
                         state = "endgame"
                     end
                     if state == "firstmove" then
-                        placeMines(clicked_x, clicked_y)
+                        board:placeMines(cell, total_mines)
                         start_time = love.timer.getTime()
                         state = "play"
                     end

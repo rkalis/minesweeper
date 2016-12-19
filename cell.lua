@@ -80,6 +80,17 @@ function Cell:click()
     return true
 end
 
+function Cell:equals(other)
+    return self.x == other.x and self.y == other.y
+end
+
+function Cell:isNeighbour(other)
+    for _, cell in ipairs(self.neighbours) do
+        if cell:equals(other) then return true end
+    end
+    return false
+end
+
 
 function Cell:drawSprite(sprite)
     love.graphics.draw(sprite, self.x, self.y, 0, self.size / 120)
