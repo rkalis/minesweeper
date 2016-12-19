@@ -32,7 +32,7 @@ function preGame:mousepressed(x, y, button, isTouch)
 end
 
 function preGame:draw()
-    UI:draw()
+    ui:draw(total_mines - total_flags, math.floor(score))
 end
 
 return preGame

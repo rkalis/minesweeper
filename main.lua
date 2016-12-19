@@ -73,6 +73,9 @@ function love.load()
                                 "highscores_medium.txt",
                                 "highscores_hard.txt")
 
+    ui = UI:new(font, WINDOW_WIDTH / 2 + 40, STATS_HEIGHT / 2,
+                WINDOW_WIDTH * 1/5 - 20, STATS_HEIGHT / 2)
+
     -- Cells initialisattion
     board = Board:new(NUM_COLS, NUM_ROWS, CELL_SIZE, STATS_HEIGHT)
 
@@ -225,15 +228,7 @@ function love.draw()
     -- smiley.
     if state == "play" or state == "firstmove" or state == "endgame"
     or state == "highscoresEnter" or state == "highscoresDisplay" then
-        love.graphics.setColor(0,0,0)
-        love.graphics.setFont(font)
-
-        love.graphics.printf("Mines remaining: " .. (total_mines - total_flags),
-                             WINDOW_WIDTH / 2 + 35, STATS_HEIGHT / 2,
-                             WINDOW_WIDTH / 2 - 40, "center")
-
-        love.graphics.print("Time: " .. (math.floor(score)),
-                            WINDOW_WIDTH * 1/5 - 20, STATS_HEIGHT / 2)
+        ui:draw(total_mines - total_flags, math.floor(score))
     end
 
     -- Draws the standard board
