@@ -26,8 +26,8 @@ function menu:mousereleased(x, y, button, isTouch)
             buttons.easy = nil
             buttons.hard = nil
 
-            -- Gamestate.switch(states.preGame)
-            state = "firstmove"
+            Gamestate.switch(states.preGame)
+            -- state = "firstmove"
         end
     end
 end

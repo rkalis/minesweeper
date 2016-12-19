@@ -7,26 +7,28 @@ function preGame:mousereleased(x, y, button, isTouch)
     local cell = board:mouseToCell(x, y)
     if not cell then return end
     if button == 1 then
-        placeMines(cell, total_mines)
+        board:placeMines(cell, total_mines)
         start_time = love.timer.getTime()
 
         cell:click()
 
         if checkWin() then
             state = "endgame"
+            Gamestate.switch(states.placeholder)
         end
 
         state = "play"
+        Gamestate.switch(states.placeholder)
     end
 
 end
 
 function preGame:mousepressed(x, y, button, isTouch)
-    local cell = board:mouseToCell(x, y)
-    if not cell then return end
-    if button == 2 then
-        cell:toggleFlag()
-    end
+    -- local cell = board:mouseToCell(x, y)
+    -- if not cell then return end
+    -- if button == 2 then
+    --     cell:toggleFlag()
+    -- end
 end
 
 function preGame:draw()

@@ -36,7 +36,8 @@ Gamestate = require("lib/gamestate")
 utils = require("lib/utils")
 states = {
     menu = require("states/menu"),
-    preGame = require("states/preGame")
+    preGame = require("states/preGame"),
+    placeholder = {}
 }
 
 UI = require "UI"
