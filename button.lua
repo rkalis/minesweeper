@@ -27,3 +27,5 @@ end
 function Button:isClicked(mouse_x, mouse_y)
     return utils.is_clicked(self, mouse_x, mouse_y)
 end
+
+return Button

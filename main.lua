@@ -45,10 +45,9 @@ states = {
 
 UI = require "UI"
 
-require("cell")
-require("board")
-require("button")
-require("highscores")
+Board = require("board")
+Button = require("button")
+Highscores = require("highscores")
 
 -- This is the entrypoint of the code, here variables are initialised and the
 -- initial state is set

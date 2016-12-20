@@ -1,4 +1,4 @@
-require "cell"
+Cell = require "cell"
 
 Board = {}
 
@@ -93,3 +93,5 @@ function Board:draw()
         end
     end
 end
+
+return Board

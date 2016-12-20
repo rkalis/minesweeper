@@ -123,3 +123,5 @@ function Cell:draw()
     love.graphics.rectangle("line", self.x, self.y, self.size, self.size)
     love.graphics.setColor(255,255,255)
 end
+
+return Cell

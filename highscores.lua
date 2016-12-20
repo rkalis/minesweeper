@@ -161,3 +161,5 @@ function Highscores:addScore(difficulty, name, score)
     self:sort(difficulty)
     self:save(difficulty)
 end
+
+return Highscores
