@@ -2,7 +2,7 @@
 -- A cell can contain a mine, it can be clicked, it can be checked and it can
 -- be flagged. It has a size and coordinates. It also contains the number of
 -- neighbouring mines.
-Cell = {}
+local Cell = {}
 
 function Cell:new(x, y, size)
     local obj = {
@@ -27,17 +27,18 @@ end
 -- in this way, the flags are properly removed, unless it is done to clear the
 -- board at the end of the game.
 function Cell:checkNeighbours(clear_flags)
+    local flags_cleared = 0
     -- Clears flag
     if clear_flags then
         if self.flagged then
             self.flagged = false
-            total_flags = total_flags - 1
+            flags_cleared = flags_cleared + 1
         end
     end
 
     if self.mine or self.checked then
         self.checked = true
-        return
+        return flags_cleared
     end
 
     -- Checks the amount of mines
@@ -49,30 +50,30 @@ function Cell:checkNeighbours(clear_flags)
     self.checked = true
 
     -- Calls the checkNeighbours function for all neighbours
-    if self.neighbouring_mines > 0 then return end
+    if self.neighbouring_mines > 0 then return flags_cleared end
     for _, neighbour in ipairs(self.neighbours) do
-        neighbour:checkNeighbours(clear_flags)
+        flags_cleared = flags_cleared + neighbour:checkNeighbours(clear_flags)
     end
-
+    return flags_cleared
 end
 
 function Cell:toggleFlag()
     if not self.flagged and not (self.checked or self.clicked) then
         self.flagged = true
-        total_flags = total_flags + 1
+        return 1
     elseif self.flagged and not (self.checked or self.clicked) then
         self.flagged = false
-        total_flags = total_flags - 1
+        return -1
     end
 end
 
 function Cell:click()
     if not self.flagged then
         self.clicked = true
-        self:checkNeighbours(true)
-        return true
+
+        return self:checkNeighbours(true)
     end
-    return false
+    return nil
 end
 
 function Cell:equals(other)

@@ -1,33 +1,41 @@
 local enterHighScores = {}
 
+function enterHighScores:enter(previous, game)
+    self.game = game
+    self.input = ""
+end
+
 function enterHighScores:mousereleased(x, y, button)
-    if button == 1 and buttons.medium:isClicked(x, y) then
-        reset()
+    if button == 1 and self.game.buttons.medium:isClicked(x, y) then
+        Gamestate.switch(states.menu, self.game:reset())
     end
 end
 
 function enterHighScores:keypressed(key)
-    if input:len() < 10 then
+    if self.input:len() < 10 then
         if key and key:match('^[%w]$') then
-            input = input .. key:upper()
+            self.input = self.input .. key:upper()
         end
     end
     if key == "backspace" then
-        input = input:sub(1, -2)
+        self.input = self.input:sub(1, -2)
     elseif key == "return" then
-        if input ~= "" then
-            local name = input
-            highscores:addScore(difficulty, name, score)
+        if self.input ~= "" then
+            local difficulty = self.game.difficulty
+            local name = self.input
+            local score = self.game.score
+            self.game.highscores:addScore(difficulty, name, score)
         end
-        Gamestate.switch(states.displayHighScores)
+        Gamestate.switch(states.displayHighScores, self.game)
     end
 end
 
 function enterHighScores:draw()
-    ui:draw(total_mines - total_flags, math.floor(score))
+    local mines_remaining = self.game.total_mines - self.game.total_flags
+    self.game.ui:draw(mines_remaining, math.floor(self.game.score))
 
-    buttons.medium.smiley = outcome
-    buttons.medium:draw()
+    self.game.buttons.medium.smiley = self.game.outcome
+    self.game.buttons.medium:draw()
 
     love.graphics.setColor(0,0,0)
     love.graphics.rectangle("line", WINDOW_WIDTH / 2 - 100,
@@ -44,7 +52,7 @@ function enterHighScores:draw()
     love.graphics.rectangle("fill", WINDOW_WIDTH / 2 - 50,
                             WINDOW_HEIGHT / 2 - 10, 100, 20)
     love.graphics.setColor(0,0,0)
-    love.graphics.printf(input, WINDOW_WIDTH / 2 - 49,
+    love.graphics.printf(self.input, WINDOW_WIDTH / 2 - 49,
                          WINDOW_HEIGHT / 2 - 10, 98, "left")
     love.graphics.setColor(255,255,255)
 end

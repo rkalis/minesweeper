@@ -1,4 +1,4 @@
-Highscores = {}
+local Highscores = {}
 
 -- Creates new highscores at the given files, creating the files if they
 -- didn't exist already
@@ -100,10 +100,10 @@ function Highscores:draw(difficulty)
         and self.highscores[difficulty][i][2] then
             love.graphics.print(i, WINDOW_WIDTH / 2 - 110,
                                    WINDOW_HEIGHT / 2 - 150 + i * 20)
-            love.graphics.print(highscores.highscores[difficulty][i][1],
+            love.graphics.print(self.highscores[difficulty][i][1],
                                 WINDOW_WIDTH / 2 - 80,
                                 WINDOW_HEIGHT / 2 - 150 + i * 20)
-            love.graphics.print(highscores.highscores[difficulty][i][2],
+            love.graphics.print(self.highscores[difficulty][i][2],
                                 WINDOW_WIDTH / 2 + 70,
                                 WINDOW_HEIGHT / 2 - 150 + i * 20)
         end

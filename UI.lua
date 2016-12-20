@@ -1,8 +1,7 @@
-UI = {}
+local UI = {}
 
-function UI:new(font, mines_x, mines_y, time_x, time_y)
+function UI:new(mines_x, mines_y, time_x, time_y)
     local obj = {
-        font = font,
         mines_x = mines_x,
         mines_y = mines_y,
         time_x = time_x,
@@ -15,7 +14,6 @@ end
 
 function UI:draw(mines, score)
     love.graphics.setColor(0,0,0)
-    love.graphics.setFont(self.font)
 
     love.graphics.print("Mines remaining: " .. mines,
                          self.mines_x, self.mines_y)

@@ -1,30 +1,33 @@
 local endgame = {}
 
-function endgame:enter()
+function endgame:enter(previous, game)
     self.time = 0
+    self.game = game
 end
 
 function endgame:update(dt)
     if self.time == 0 then
-        love.audio.play(assets.audio[outcome])
-        board:clear()
+        love.audio.play(assets.audio[self.game.outcome])
+        self.game.board:clear()
     end
     self.time = self.time + dt
 
-    if outcome == "win" and self.time >= 3 then
-        Gamestate.switch(states.enterHighScores)
+    if self.game.outcome == "win" and self.time >= 3 then
+        Gamestate.switch(states.enterHighScores, self.game)
     end
 end
 
 function endgame:draw()
-    ui:draw(total_mines - total_flags, math.floor(score))
-    buttons.medium.smiley = outcome
-    buttons.medium:draw()
+    local mines_remaining = self.game.total_mines - self.game.total_flags
+    self.game.ui:draw(mines_remaining, math.floor(self.game.score))
+    
+    self.game.buttons.medium.smiley = self.game.outcome
+    self.game.buttons.medium:draw()
 end
 
 function endgame:mousereleased(x, y, button)
-    if button == 1 and buttons.medium:isClicked(x, y) then
-        reset()
+    if button == 1 and self.game.buttons.medium:isClicked(x, y) then
+        Gamestate.switch(states.menu, self.game:reset())
     end
 end
 

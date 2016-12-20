@@ -1,7 +1,7 @@
 local Cell = require "cell"
 local kalis = require "lib/kalis"
 
-Board = {}
+local Board = {}
 
 function Board:new(width, height, cell_size, start_of_board)
     local obj = {
