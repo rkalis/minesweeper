@@ -1,4 +1,5 @@
-Cell = require "cell"
+local Cell = require "cell"
+local kalis = require "lib/kalis"
 
 Board = {}
 
@@ -75,9 +76,17 @@ function Board:mouseToBoard(mouse_x, mouse_y)
     return clicked_x, clicked_y
 end
 
+function Board:clear()
+    for _, row in kalis.ipairs(self) do
+        for _, cell in kalis.ipairs(row) do
+            cell:checkNeighbours(false)
+        end
+    end
+end
+
 function Board:isCleared()
-    for _, row in utils.ipairs(self) do
-        for _, cell in utils.ipairs(row) do
+    for _, row in kalis.ipairs(self) do
+        for _, cell in kalis.ipairs(row) do
             if not cell.mine and not cell.checked then
                 return false
             end
@@ -87,8 +96,8 @@ function Board:isCleared()
 end
 
 function Board:draw()
-    for _, row in utils.ipairs(self) do
-        for _, cell in utils.ipairs(row) do
+    for _, row in kalis.ipairs(self) do
+        for _, cell in kalis.ipairs(row) do
             cell:draw()
         end
     end

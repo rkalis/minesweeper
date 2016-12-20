@@ -1,4 +1,4 @@
-local utils = require("lib/utils")
+local kalis = require("lib/kalis")
 
 -- The button table prototypes a clickable button such as the smiley buttons.
 -- A button has a height, width and coordinates. A button can be clicked.
@@ -25,7 +25,7 @@ end
 
 -- Checks if the button is clicked by the mouse at coords (mouse_x, mouse_y)
 function Button:isClicked(mouse_x, mouse_y)
-    return utils.is_clicked(self, mouse_x, mouse_y)
+    return kalis.is_clicked(self, mouse_x, mouse_y)
 end
 
 return Button

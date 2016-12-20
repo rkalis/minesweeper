@@ -33,7 +33,6 @@
 
 assets = require("assets")
 Gamestate = require("lib/gamestate")
-utils = require("lib/utils")
 states = {
     menu = require("states/menu"),
     preGame = require("states/preGame"),

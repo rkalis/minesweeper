@@ -7,14 +7,9 @@ end
 function endgame:update(dt)
     if self.time == 0 then
         love.audio.play(assets.audio[outcome])
+        board:clear()
     end
     self.time = self.time + dt
-
-    for _, row in utils.ipairs(board) do
-        for _, cell in utils.ipairs(row) do
-            cell:checkNeighbours(false)
-        end
-    end
 
     if outcome == "win" and self.time >= 3 then
         Gamestate.switch(states.enterHighScores)
