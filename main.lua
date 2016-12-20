@@ -76,6 +76,15 @@ function love.load()
     ui = UI:new(font, WINDOW_WIDTH / 2 + 40, STATS_HEIGHT / 2,
                 WINDOW_WIDTH * 1/5 - 20, STATS_HEIGHT / 2)
 
+    -- Button initialisation
+    buttons = {
+        easy   = Button:new(WINDOW_WIDTH * 1/4 - 30, 20),
+        medium = Button:new(WINDOW_WIDTH * 1/2 - 30, 20),
+        hard   = Button:new(WINDOW_WIDTH * 3/4 - 30, 20)
+    }
+    buttons.easy.smiley = "green"
+    buttons.hard.smiley = "red"
+
     -- Cells initialisattion
     board = Board:new(NUM_COLS, NUM_ROWS, CELL_SIZE, STATS_HEIGHT)
 
@@ -125,58 +134,33 @@ end
 
 function love.mousepressed(x, y, button)
     if not(state == "play" or state == "firstmove") then return end
-    if y < STATS_HEIGHT then return end
-    -- The right button toggles whether the cell is flagged.
+    local cell = board:mouseToCell(x, y)
+    if not cell then return end
     if button == 2 then
-        local clicked_x = math.floor((y - STATS_HEIGHT) / CELL_SIZE)
-        local clicked_y = math.floor(x / CELL_SIZE)
-        cell = board[clicked_x][clicked_y]
-
-        if not cell.flagged and not (cell.checked or cell.clicked) then
-            cell.flagged = true
-            total_flags = total_flags + 1
-        elseif cell.flagged and not (cell.checked or cell.clicked) then
-            cell.flagged = false
-            total_flags = total_flags - 1
-        end
+        cell:toggleFlag()
     end
 end
 
 function love.mousereleased(x, y, button)
     if state == "play" or state == "firstmove" then
-        -- If the coordinates are outside of the stats bar
-        if y > STATS_HEIGHT then
-
-            -- This translates the coordinates into indices for the
-            -- board table.
-            local clicked_x = math.floor((y - STATS_HEIGHT) / CELL_SIZE)
-            local clicked_y = math.floor(x / CELL_SIZE)
-            cell = board[clicked_x][clicked_y]
-
-            if button == 1 then
-                if not cell.flagged then
-                    cell.clicked = true
-                    if cell.mine then
-                        outcome = "lose"
-                        state = "endgame"
-                    end
-                    if state == "firstmove" then
-                        board:placeMines(cell, total_mines)
-                        start_time = love.timer.getTime()
-                        state = "play"
-                    end
-                    cell:checkNeighbours(true)
-
-                    -- It is checked after each left click whether this click
-                    -- has caused victory.
-                    if checkWin() then
-                        state = "endgame"
-                    end
-                end
+        if button == 1 then
+            if buttons.medium:isClicked(x, y) then
+                reset()
+                return
             end
-        -- If the smiley is clicked the game is reset.
-        elseif buttons.medium:isClicked(x, y) then
-            reset()
+
+            local cell = board:mouseToCell(x, y)
+            if not cell then return end
+
+            if cell:click() and cell.mine then
+                outcome = "lose"
+                state = "endgame"
+            end
+
+            if checkWin() then
+                outcome = "win"
+                state = "endgame"
+            end
         end
     -- If the smiley is clicked the game is reset.
     elseif state == "endgame" or state == "highscoresEnter"
@@ -231,10 +215,14 @@ function love.draw()
         ui:draw(total_mines - total_flags, math.floor(score))
     end
 
-    -- Draws the standard board
+    -- Draws the standard board, while also setting the O-face where applicable
     for _, row in utils.ipairs(board) do
         for _, cell in utils.ipairs(row) do
             cell:draw()
+            if not cell.checked and not cell.flagged and love.mouse.isDown(1)
+               and utils.is_clicked(cell, love.mouse.getX(), love.mouse.getY()) then
+                buttons.medium.smiley = "o"
+           end
         end
     end
 

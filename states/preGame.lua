@@ -4,9 +4,15 @@ function preGame:enter(previous)
 end
 
 function preGame:mousereleased(x, y, button, isTouch)
-    local cell = board:mouseToCell(x, y)
-    if not cell then return end
     if button == 1 then
+        if buttons.medium:isClicked(x, y) then
+            reset()
+            return
+        end
+
+        local cell = board:mouseToCell(x, y)
+        if not cell then return end
+
         board:placeMines(cell, total_mines)
         start_time = love.timer.getTime()
 

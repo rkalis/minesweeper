@@ -72,12 +72,10 @@ end
 function Cell:click()
     if not self.flagged then
         self.clicked = true
-        if self.mine then
-            return false
-        end
         self:checkNeighbours(true)
+        return true
     end
-    return true
+    return false
 end
 
 function Cell:equals(other)
@@ -121,8 +119,6 @@ function Cell:draw()
            (love.mouse.getX() > self.x and love.mouse.getX() < self.x + self.size) and
            (love.mouse.getY() > self.y and love.mouse.getY() < self.y + self.size) then
             self:drawSprite(assets.graphics.block[0])
-            -- TODO: This kind of breaks encapsulation
-            buttons.medium.smiley = "o"
         else
             self:drawSprite(assets.graphics.block.unclicked)
         end
