@@ -1,9 +1,8 @@
 local menu = {}
 
 function menu:mousereleased(x, y, button)
-    -- If one of the three buttons are pressed, the number of mines is
-    -- determined and the state changes to firstmove.
     if button ~= 1 then return end
+
     for option, menuButton in pairs(buttons) do
         if menuButton:isClicked(x, y) then
             if option == "easy" then mines_percentage = 11

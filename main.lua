@@ -39,7 +39,8 @@ states = {
     preGame = require("states/preGame"),
     game = require("states/game"),
     endgame = require("states/endgame"),
-    placeholder = {}
+    enterHighScores = require("states/enterHighScores"),
+    displayHighScores = require("states/displayHighScores")
 }
 
 UI = require "UI"
@@ -114,42 +115,6 @@ function checkWin()
     return true
 end
 
-function love.mousereleased(x, y, button)
-    -- If the smiley is clicked the game is reset.
-    if state == "highscoresEnter"
-        or state == "highscoresDisplay" then
-        if buttons.medium:isClicked(x, y) then
-            reset()
-        end
-    end
-end
-
--- The only time this function is used is when the game state is
--- highscoresEnter, then it appends the pressed key to the input variable
--- if it's an alphanumerical key and input is 10 characters long at most.
--- If the backspace key is pressed, the last character in the input variable
--- is removed. If return is pressed the score is submitted to the high scores
--- with the input as name, but only if the input is not blank.
--- Then the high scores are loaded, sorted, and saved. After which they are
--- displayed.
-function love.keypressed(key)
-    if state == "highscoresEnter" then
-        if input:len() < 10 then
-            if key and key:match('^[%w]$') then
-                input = input .. key:upper()
-            end
-        end
-        if key == "backspace" then
-            input = input:sub(1, -2)
-        elseif key == "return" then
-            if input ~= "" then
-                name = input
-                highscores:addScore(difficulty, name, score)
-            end
-            state = "highscoresDisplay"
-        end
-    end
-end
 
 -- DRAWING FUNCTIONS:
 
@@ -158,55 +123,22 @@ end
 -- game boards.
 function love.draw()
     buttons.medium.smiley = "def"
-    -- The stats bar:
 
-    -- The stats bar while the game is in progress or has ended.
-    -- It includes the number of mines remaining and the time, as well as the
-    -- smiley.
-    if state == "highscoresEnter" or state == "highscoresDisplay" then
-        ui:draw(total_mines - total_flags, math.floor(score))
-    end
-
-    -- Draws the standard board, while also setting the O-face where applicable
+    -- Draws the board
     for _, row in utils.ipairs(board) do
         for _, cell in utils.ipairs(row) do
             cell:draw()
+
+            -- Sets the smiley O-face
             if not cell.checked and not cell.flagged and love.mouse.isDown(1)
-               and utils.is_clicked(cell, love.mouse.getX(), love.mouse.getY()) then
+               and utils.is_clicked(cell, love.mouse.getX(),
+                                          love.mouse.getY()) then
                 buttons.medium.smiley = "o"
            end
         end
     end
 
-    -- An input box is drawn over the board, as well as the input the
-    -- user gives.
-    if state == "highscoresEnter" then
-        buttons.medium.smiley = outcome
-        love.graphics.setColor(0,0,0)
-        love.graphics.rectangle("line", WINDOW_WIDTH / 2 - 100,
-                                WINDOW_HEIGHT / 2 - 50, 200, 100)
-        love.graphics.setColor(200,200,200)
-        love.graphics.rectangle("fill", WINDOW_WIDTH / 2 - 100,
-                                WINDOW_HEIGHT / 2 - 50, 200, 100)
-        love.graphics.setColor(0,0,0)
-        love.graphics.printf("YOUR NAME: ", WINDOW_WIDTH / 2 - 50,
-                             WINDOW_HEIGHT / 2 - 30, 100, "center")
-        love.graphics.rectangle("line", WINDOW_WIDTH / 2 - 50,
-                                WINDOW_HEIGHT / 2 - 10, 100, 20)
-        love.graphics.setColor(255,255,255)
-        love.graphics.rectangle("fill", WINDOW_WIDTH / 2 - 50,
-                                WINDOW_HEIGHT / 2 - 10, 100, 20)
-        love.graphics.setColor(0,0,0)
-        love.graphics.printf(input, WINDOW_WIDTH / 2 - 49,
-                             WINDOW_HEIGHT / 2 - 10, 98, "left")
-        love.graphics.setColor(255,255,255)
-    -- A rectangle is drawn over the board, as well as the list of high scores.
-    elseif state == "highscoresDisplay" then
-        buttons.medium.smiley = outcome
-        highscores:draw(difficulty)
-    end
-
-
+    -- Draws the buttons
     for option, button in pairs(buttons) do
         button:draw()
     end

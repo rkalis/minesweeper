@@ -1,6 +1,4 @@
-local endgame = {
-    time = 0
-}
+local endgame = {}
 
 function endgame:enter()
     self.time = 0
@@ -19,8 +17,7 @@ function endgame:update(dt)
     end
 
     if outcome == "win" and self.time >= 3 then
-        state = "highscoresEnter"
-        Gamestate.switch(states.placeholder)
+        Gamestate.switch(states.enterHighScores)
     end
 end
 

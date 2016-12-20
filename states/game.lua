@@ -1,40 +1,36 @@
 local game = {}
 
-function game:enter(previous)
-end
-
 function game:update(dt)
     score = score + dt
 end
 
 function game:mousereleased(x, y, button)
-    if button == 1 then
-        if buttons.medium:isClicked(x, y) then
-            reset()
-            return
-        end
+    if button ~= 1 then return end
 
-        local cell = board:mouseToCell(x, y)
-        if not cell then return end
-
-        if cell:click() and cell.mine then
-            outcome = "lose"
-            Gamestate.switch(states.endgame)
-        end
-
-        if checkWin() then
-            Gamestate.switch(states.endgame)
-        end
+    if buttons.medium:isClicked(x, y) then
+        reset()
+        return
     end
 
+    local cell = board:mouseToCell(x, y)
+    if not cell then return end
+
+    if cell:click() and cell.mine then
+        outcome = "lose"
+        Gamestate.switch(states.endgame)
+    end
+
+    if checkWin() then
+        Gamestate.switch(states.endgame)
+    end
 end
 
 function game:mousepressed(x, y, button)
-    if button == 2 then
-        local cell = board:mouseToCell(x, y)
-        if not cell then return end
-        cell:toggleFlag()
-    end
+    if button ~= 2 then return end
+    
+    local cell = board:mouseToCell(x, y)
+    if not cell then return end
+    cell:toggleFlag()
 end
 
 function game:draw()
