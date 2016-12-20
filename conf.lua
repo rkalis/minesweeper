@@ -14,7 +14,7 @@ function love.conf(t)
     t.console = false
 
     t.window.title          = "Minesweeper Xxtreme Relo4ded 2.0: Retribution"
-    t.window.icon           = nil
+    t.window.icon           = "assets/graphics/smiley.png"
     t.window.width          = WINDOW_WIDTH
     t.window.height         = WINDOW_HEIGHT
     t.window.borderless     = false
