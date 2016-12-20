@@ -124,19 +124,14 @@ end
 function love.draw()
     buttons.medium.smiley = "def"
 
-    -- Draws the board
-    for _, row in utils.ipairs(board) do
-        for _, cell in utils.ipairs(row) do
-            cell:draw()
-
-            -- Sets the smiley O-face
-            if not cell.checked and not cell.flagged and love.mouse.isDown(1)
-               and utils.is_clicked(cell, love.mouse.getX(),
-                                          love.mouse.getY()) then
-                buttons.medium.smiley = "o"
-           end
+    if love.mouse.isDown(1) then
+        local cell = board:mouseToCell(love.mouse.getX(), love.mouse.getY())
+        if cell and not cell.checked and not cell.flagged then
+            buttons.medium.smiley = "o"
         end
     end
+
+    board:draw()
 
     -- Draws the buttons
     for option, button in pairs(buttons) do

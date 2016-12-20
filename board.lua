@@ -74,3 +74,11 @@ function Board:mouseToBoard(mouse_x, mouse_y)
     local clicked_x = math.floor(mouse_x / self.cell_size)
     return clicked_x, clicked_y
 end
+
+function Board:draw()
+    for _, row in utils.ipairs(self) do
+        for _, cell in utils.ipairs(row) do
+            cell:draw()
+        end
+    end
+end
