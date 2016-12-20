@@ -1,7 +1,7 @@
-local Board = require "board"
-local Button = require "button"
-local Highscores = require "highscores"
-local UI = require "UI"
+local Board = require "src.board"
+local Button = require "src.button"
+local Highscores = require "src.highscores"
+local UI = require "src.UI"
 
 local Game = {}
 

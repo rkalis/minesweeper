@@ -20,7 +20,7 @@ function menu:mousereleased(x, y, button)
             self.game.buttons.easy = nil
             self.game.buttons.hard = nil
 
-            Gamestate.switch(states.preGame, self.game)
+            Gamestate.switch(states.pregame, self.game)
         end
     end
 end

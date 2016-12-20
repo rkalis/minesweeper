@@ -1,4 +1,4 @@
-local kalis = require("lib/kalis")
+local kalis = require "lib.kalis"
 
 -- The button table prototypes a clickable button such as the smiley buttons.
 -- A button has a height, width and coordinates. A button can be clicked.

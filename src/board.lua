@@ -1,5 +1,5 @@
-local Cell = require "cell"
-local kalis = require "lib/kalis"
+local Cell = require "src.cell"
+local kalis = require "lib.kalis"
 
 local Board = {}
 

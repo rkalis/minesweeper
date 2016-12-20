@@ -31,19 +31,19 @@
 --   week though.
 -- * All graphics and sound effects were made by me.
 
-assets = require "assets"
-Gamestate = require "lib/gamestate"
+assets = require "assets.assets"
+Gamestate = require "lib.gamestate"
 
 states = {
-    menu = require "states/menu",
-    preGame = require "states/preGame",
-    game = require "states/game",
-    endgame = require "states/endgame",
-    enterHighScores = require "states/enterHighScores",
-    displayHighScores = require "states/displayHighScores"
+    menu = require "states.menu",
+    pregame = require "states.pregame",
+    game = require "states.game",
+    endgame = require "states.endgame",
+    enterHighScores = require "states.enterHighScores",
+    displayHighScores = require "states.displayHighScores"
 }
 
-local Game = require "game"
+local Game = require "src.game"
 
 
 -- This is the entrypoint of the code, here variables are initialised and the
