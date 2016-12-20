@@ -20,14 +20,14 @@ function game:mousereleased(x, y, button)
         Gamestate.switch(states.endgame)
     end
 
-    if checkWin() then
+    if board:isCleared() then
         Gamestate.switch(states.endgame)
     end
 end
 
 function game:mousepressed(x, y, button)
     if button ~= 2 then return end
-    
+
     local cell = board:mouseToCell(x, y)
     if not cell then return end
     cell:toggleFlag()

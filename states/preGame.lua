@@ -16,7 +16,7 @@ function preGame:mousereleased(x, y, button)
 
     cell:click()
 
-    if checkWin() then
+    if board:isCleared() then
         Gamestate.switch(states.endgame)
     end
 

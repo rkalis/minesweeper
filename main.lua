@@ -104,23 +104,6 @@ function reset()
     init()
 end
 
-function checkWin()
-    for _, row in utils.ipairs(board) do
-        for _, cell in utils.ipairs(row) do
-            if not (cell.mine or cell.checked) then
-                return false
-            end
-        end
-    end
-    return true
-end
-
-
--- DRAWING FUNCTIONS:
-
--- love.draw is called continuously during the game. It draws the playing
--- field. For the different states there are (slightly) different looking
--- game boards.
 function love.draw()
     buttons.medium.smiley = "def"
 

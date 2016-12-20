@@ -1,4 +1,4 @@
--- require "cell"
+require "cell"
 
 Board = {}
 
@@ -73,6 +73,17 @@ function Board:mouseToBoard(mouse_x, mouse_y)
     local clicked_y = math.floor((mouse_y - self.start_of_board) / self.cell_size)
     local clicked_x = math.floor(mouse_x / self.cell_size)
     return clicked_x, clicked_y
+end
+
+function Board:isCleared()
+    for _, row in utils.ipairs(self) do
+        for _, cell in utils.ipairs(row) do
+            if not cell.mine and not cell.checked then
+                return false
+            end
+        end
+    end
+    return true
 end
 
 function Board:draw()
