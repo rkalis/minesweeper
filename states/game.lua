@@ -24,13 +24,12 @@ function game:mousereleased(x, y, button)
         self.game.total_flags = self.game.total_flags - flags_cleared
 
         if cell.mine then
-            self.game.outcome = "lose"
-            Gamestate.switch(states.endgame, self.game)
+            Gamestate.switch(states.endgame, self.game, "lose")
         end
     end
 
     if self.game.board:isCleared() then
-        Gamestate.switch(states.endgame, self.game)
+        Gamestate.switch(states.endgame, self.game, "win")
     end
 end
 

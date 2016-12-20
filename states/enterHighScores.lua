@@ -34,7 +34,7 @@ function enterHighScores:draw()
     local mines_remaining = self.game.total_mines - self.game.total_flags
     self.game.ui:draw(mines_remaining, math.floor(self.game.score))
 
-    self.game.ui.buttons.medium.smiley = self.game.outcome
+    self.game.ui.buttons.medium.smiley = "win"
     self.game.ui.buttons.medium:draw()
 
     love.graphics.setColor(0,0,0)

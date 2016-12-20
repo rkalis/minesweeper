@@ -20,7 +20,7 @@ function preGame:mousereleased(x, y, button)
     cell:click()
 
     if self.game.board:isCleared() then
-        Gamestate.switch(states.endgame, self.game)
+        Gamestate.switch(states.endgame, self.game, "win")
     end
 
     Gamestate.switch(states.game, self.game)

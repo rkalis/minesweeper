@@ -8,7 +8,6 @@ function Game:new()
     local obj = {
         total_flags = 0,
         total_mines = 0,
-        outcome = "win",
         start_time = 0,
         score = 0,
         difficulty = "medium",

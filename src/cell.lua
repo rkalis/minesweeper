@@ -59,10 +59,13 @@ function Cell:checkNeighbours(clear_flags)
 end
 
 function Cell:toggleFlag()
-    if not self.flagged and not (self.checked or self.clicked) then
+    if self.checked or self.clicked then
+        return 0
+    end
+    if not self.flagged then
         self.flagged = true
         return 1
-    elseif self.flagged and not (self.checked or self.clicked) then
+    elseif self.flagged then
         self.flagged = false
         return -1
     end
