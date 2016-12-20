@@ -37,6 +37,7 @@ utils = require("lib/utils")
 states = {
     menu = require("states/menu"),
     preGame = require("states/preGame"),
+    game = require("states/game"),
     placeholder = {}
 }
 
@@ -97,9 +98,7 @@ end
 -- the main game logic is executed in combination with the event functions
 -- (e.g. mousepressed, keypressed)
 function love.update(dt)
-    if state == "play" then
-        score = score + dt
-    elseif state == "endgame" then
+    if state == "endgame" then
         if time == 0 then
             love.audio.play(assets.audio[outcome])
         end
@@ -132,38 +131,9 @@ function checkWin()
     return true
 end
 
-function love.mousepressed(x, y, button)
-    if not(state == "play" or state == "firstmove") then return end
-    local cell = board:mouseToCell(x, y)
-    if not cell then return end
-    if button == 2 then
-        cell:toggleFlag()
-    end
-end
-
 function love.mousereleased(x, y, button)
-    if state == "play" or state == "firstmove" then
-        if button == 1 then
-            if buttons.medium:isClicked(x, y) then
-                reset()
-                return
-            end
-
-            local cell = board:mouseToCell(x, y)
-            if not cell then return end
-
-            if cell:click() and cell.mine then
-                outcome = "lose"
-                state = "endgame"
-            end
-
-            if checkWin() then
-                outcome = "win"
-                state = "endgame"
-            end
-        end
     -- If the smiley is clicked the game is reset.
-    elseif state == "endgame" or state == "highscoresEnter"
+    if state == "endgame" or state == "highscoresEnter"
         or state == "highscoresDisplay" then
         if buttons.medium:isClicked(x, y) then
             reset()
@@ -210,7 +180,7 @@ function love.draw()
     -- The stats bar while the game is in progress or has ended.
     -- It includes the number of mines remaining and the time, as well as the
     -- smiley.
-    if state == "play" or state == "firstmove" or state == "endgame"
+    if state == "endgame"
     or state == "highscoresEnter" or state == "highscoresDisplay" then
         ui:draw(total_mines - total_flags, math.floor(score))
     end

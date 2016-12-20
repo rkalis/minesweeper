@@ -1,8 +1,5 @@
 local menu = {}
 
-function menu:enter(previous)
-end
-
 function menu:mousereleased(x, y, button, isTouch)
     -- If one of the three buttons are pressed, the number of mines is
     -- determined and the state changes to firstmove.

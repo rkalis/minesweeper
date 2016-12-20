@@ -1,8 +1,5 @@
 local preGame = {}
 
-function preGame:enter(previous)
-end
-
 function preGame:mousereleased(x, y, button, isTouch)
     if button == 1 then
         if buttons.medium:isClicked(x, y) then
@@ -23,18 +20,10 @@ function preGame:mousereleased(x, y, button, isTouch)
             Gamestate.switch(states.placeholder)
         end
 
-        state = "play"
-        Gamestate.switch(states.placeholder)
+        -- state = "play"
+        Gamestate.switch(states.game)
     end
 
-end
-
-function preGame:mousepressed(x, y, button, isTouch)
-    -- local cell = board:mouseToCell(x, y)
-    -- if not cell then return end
-    -- if button == 2 then
-    --     cell:toggleFlag()
-    -- end
 end
 
 function preGame:draw()
