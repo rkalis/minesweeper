@@ -22,6 +22,7 @@ function UI:draw(mines, score)
 
     love.graphics.print("Time: " .. score,
                         self.time_x, self.time_y)
+    love.graphics.setColor(255,255,255)
 end
 
 return UI

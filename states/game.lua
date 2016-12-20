@@ -7,7 +7,7 @@ function game:update(dt)
     score = score + dt
 end
 
-function game:mousereleased(x, y, button, isTouch)
+function game:mousereleased(x, y, button)
     if button == 1 then
         if buttons.medium:isClicked(x, y) then
             reset()
@@ -19,19 +19,17 @@ function game:mousereleased(x, y, button, isTouch)
 
         if cell:click() and cell.mine then
             outcome = "lose"
-            state = "endgame"
-            Gamestate.switch(states.placeholder)
+            Gamestate.switch(states.endgame)
         end
 
         if checkWin() then
-            state = "endgame"
-            Gamestate.switch(states.placeholder)
+            Gamestate.switch(states.endgame)
         end
     end
 
 end
 
-function game:mousepressed(x, y, button, isTouch)
+function game:mousepressed(x, y, button)
     if button == 2 then
         local cell = board:mouseToCell(x, y)
         if not cell then return end

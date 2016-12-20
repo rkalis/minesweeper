@@ -1,6 +1,6 @@
 local preGame = {}
 
-function preGame:mousereleased(x, y, button, isTouch)
+function preGame:mousereleased(x, y, button)
     if button == 1 then
         if buttons.medium:isClicked(x, y) then
             reset()
@@ -16,8 +16,7 @@ function preGame:mousereleased(x, y, button, isTouch)
         cell:click()
 
         if checkWin() then
-            state = "endgame"
-            Gamestate.switch(states.placeholder)
+            Gamestate.switch(states.endgame)
         end
 
         -- state = "play"

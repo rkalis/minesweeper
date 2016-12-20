@@ -1,15 +1,4 @@
-Highscores = {
-    files = {
-        easy,
-        medium,
-        hard
-    },
-    highscores = {
-        easy = {},
-        medium = {},
-        hard = {}
-    }
-}
+Highscores = {}
 
 -- Creates new highscores at the given files, creating the files if they
 -- didn't exist already
@@ -24,11 +13,16 @@ function Highscores:new(easy_fn, medium_fn, hard_fn)
     if not love.filesystem.exists(hard_fn) then
         love.filesystem.write(hard_fn, "")
     end
-    obj = {
+    local obj = {
         files = {
             easy   = love.filesystem.newFile(easy_fn),
             medium = love.filesystem.newFile(medium_fn),
             hard   = love.filesystem.newFile(hard_fn)
+        },
+        highscores = {
+            easy = {},
+            medium = {},
+            hard = {}
         }
     }
     setmetatable(obj, self)
@@ -114,6 +108,7 @@ function Highscores:draw(difficulty)
                                 WINDOW_HEIGHT / 2 - 150 + i * 20)
         end
     end
+    love.graphics.setColor(255,255,255)
 end
 
 -- Bubble Sort algorithm:

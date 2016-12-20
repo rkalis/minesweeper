@@ -38,6 +38,7 @@ states = {
     menu = require("states/menu"),
     preGame = require("states/preGame"),
     game = require("states/game"),
+    endgame = require("states/endgame"),
     placeholder = {}
 }
 
@@ -51,6 +52,11 @@ require("highscores")
 -- This is the entrypoint of the code, here variables are initialised and the
 -- initial state is set
 function love.load()
+    Gamestate.registerEvents()
+    init()
+end
+
+function init()
     -- Random seed with a few calibration randoms
     math.randomseed(os.time())
     math.random(); math.random(); math.random(); math.random();
@@ -63,7 +69,7 @@ function love.load()
     start_time = 0
     score = 0
     input = ""
-    time = 0
+    -- time = 0
     difficulty = "medium"
 
     font = love.graphics.newFont(15)
@@ -89,35 +95,12 @@ function love.load()
     -- Cells initialisattion
     board = Board:new(NUM_COLS, NUM_ROWS, CELL_SIZE, STATS_HEIGHT)
 
-    Gamestate.registerEvents()
     Gamestate.switch(states.menu)
     state = "menu"
 end
 
--- love.update function is called continuously during the game. This is where
--- the main game logic is executed in combination with the event functions
--- (e.g. mousepressed, keypressed)
-function love.update(dt)
-    if state == "endgame" then
-        if time == 0 then
-            love.audio.play(assets.audio[outcome])
-        end
-        time = time + dt
-        for i = 0, NUM_ROWS - 1 do
-            for j = 0, NUM_COLS - 1 do
-                board[i][j]:checkNeighbours(false)
-            end
-        end
-        if outcome == "win" then
-            if time >= 3 then
-                state = "highscoresEnter"
-            end
-        end
-    end
-end
-
 function reset()
-    love.load()
+    init()
 end
 
 function checkWin()
@@ -133,7 +116,7 @@ end
 
 function love.mousereleased(x, y, button)
     -- If the smiley is clicked the game is reset.
-    if state == "endgame" or state == "highscoresEnter"
+    if state == "highscoresEnter"
         or state == "highscoresDisplay" then
         if buttons.medium:isClicked(x, y) then
             reset()
@@ -180,8 +163,7 @@ function love.draw()
     -- The stats bar while the game is in progress or has ended.
     -- It includes the number of mines remaining and the time, as well as the
     -- smiley.
-    if state == "endgame"
-    or state == "highscoresEnter" or state == "highscoresDisplay" then
+    if state == "highscoresEnter" or state == "highscoresDisplay" then
         ui:draw(total_mines - total_flags, math.floor(score))
     end
 
@@ -195,15 +177,6 @@ function love.draw()
            end
         end
     end
-
-    -- Draws the smiley that corresponds with the outcome
-    if state == "endgame" then
-        buttons.medium.smiley = outcome
-    end
-
-    -- The high score overlay:
-
-    -- Draws the fully revealed board. Over it a rectangle is drawn.
 
     -- An input box is drawn over the board, as well as the input the
     -- user gives.
@@ -226,12 +199,14 @@ function love.draw()
         love.graphics.setColor(0,0,0)
         love.graphics.printf(input, WINDOW_WIDTH / 2 - 49,
                              WINDOW_HEIGHT / 2 - 10, 98, "left")
+        love.graphics.setColor(255,255,255)
     -- A rectangle is drawn over the board, as well as the list of high scores.
     elseif state == "highscoresDisplay" then
         buttons.medium.smiley = outcome
         highscores:draw(difficulty)
     end
-    love.graphics.setColor(255,255,255)
+
+
     for option, button in pairs(buttons) do
         button:draw()
     end

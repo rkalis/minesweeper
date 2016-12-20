@@ -1,6 +1,6 @@
 local menu = {}
 
-function menu:mousereleased(x, y, button, isTouch)
+function menu:mousereleased(x, y, button)
     -- If one of the three buttons are pressed, the number of mines is
     -- determined and the state changes to firstmove.
     if button ~= 1 then return end
@@ -17,15 +17,8 @@ function menu:mousereleased(x, y, button, isTouch)
             buttons.hard = nil
 
             Gamestate.switch(states.preGame)
-            -- state = "firstmove"
         end
     end
 end
 
-function menu:draw()
-    love.graphics.setColor(255,255,255)
-    for option, button in pairs(buttons) do
-        button:draw()
-    end
-end
 return menu

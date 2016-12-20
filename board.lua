@@ -1,9 +1,6 @@
 -- require "cell"
 
-Board = {
-    start_of_board,
-    cell_size
-}
+Board = {}
 
 function Board:new(width, height, cell_size, start_of_board)
     local obj = {
@@ -15,7 +12,8 @@ function Board:new(width, height, cell_size, start_of_board)
     for i = 0, height - 1 do
         obj[i] = {}
         for j = 0, width - 1 do
-            obj[i][j] = Cell:new(j * cell_size, i * cell_size + start_of_board)
+            obj[i][j] = Cell:new(j * cell_size, i * cell_size + start_of_board,
+                                 cell_size)
         end
     end
 

@@ -2,19 +2,16 @@ local utils = require("lib/utils")
 
 -- The button table prototypes a clickable button such as the smiley buttons.
 -- A button has a height, width and coordinates. A button can be clicked.
-Button = {
-    x,
-    y,
-    width = 60,
-    height = 60,
-    clicked = false,
-    smiley = "def"
-}
+Button = {}
 
 function Button:new(x, y)
-    obj = {
+    local obj = {
         x = x,
-        y = y
+        y = y,
+        width = 60,
+        height = 60,
+        clicked = false,
+        smiley = "def"
     }
     setmetatable(obj, self)
     self.__index = self
@@ -22,7 +19,7 @@ function Button:new(x, y)
 end
 
 function Button:draw()
-    smiley = assets.graphics.smiley[self.smiley]
+    local smiley = assets.graphics.smiley[self.smiley]
     love.graphics.draw(smiley, self.x, self.y, 0, 1/2)
 end
 

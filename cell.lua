@@ -2,21 +2,18 @@
 -- A cell can contain a mine, it can be clicked, it can be checked and it can
 -- be flagged. It has a size and coordinates. It also contains the number of
 -- neighbouring mines.
-Cell = {
-    x,
-    y,
-    size = CELL_SIZE,
-    clicked = false,
-    mine = false,
-    neighbouring_mines = 0,
-    checked = false,
-    flagged = false
-}
+Cell = {}
 
-function Cell:new(x, y)
+function Cell:new(x, y, size)
     local obj = {
         x = x,
         y = y,
+        size = size,
+        clicked = false,
+        mine = false,
+        neighbouring_mines = 0,
+        checked = false,
+        flagged = false
     }
     setmetatable(obj, self)
     self.__index = self
@@ -98,7 +95,6 @@ end
 -- If the state is clicked and it is a mine, the game is lost and the state
 -- changes to endgame.
 function Cell:draw()
-    love.graphics.setColor(255,255,255)
     -- If it's being clicked, display the clicked sprite
     if self.checked then
         if self.mine then
@@ -125,4 +121,5 @@ function Cell:draw()
     end
     love.graphics.setColor(100,100,100)
     love.graphics.rectangle("line", self.x, self.y, self.size, self.size)
+    love.graphics.setColor(255,255,255)
 end
