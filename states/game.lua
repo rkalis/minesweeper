@@ -11,14 +11,14 @@ end
 function game:mousereleased(x, y, button)
     if button ~= 1 then return end
 
-    if self.game.buttons.medium:isClicked(x, y) then
+    if self.game.ui.buttons.medium:isClicked(x, y) then
         Gamestate.switch(states.menu, self.game:reset())
         return
     end
 
     local cell = self.game.board:mouseToCell(x, y)
     if not cell then return end
-    
+
     local flags_cleared = cell:click()
     if flags_cleared then
         self.game.total_flags = self.game.total_flags - flags_cleared

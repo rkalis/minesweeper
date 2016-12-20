@@ -62,19 +62,19 @@ end
 
 function love.draw()
     local game = Gamestate:current().game
-    game.buttons.medium.smiley = "def"
+    game.ui.buttons.medium.smiley = "def"
 
     if love.mouse.isDown(1) then
         local cell = game.board:mouseToCell(love.mouse.getX(), love.mouse.getY())
         if cell and not cell.checked and not cell.flagged then
-            game.buttons.medium.smiley = "o"
+            game.ui.buttons.medium.smiley = "o"
         end
     end
 
     game.board:draw()
 
     -- Draws the buttons
-    for option, button in pairs(game.buttons) do
+    for option, button in pairs(game.ui.buttons) do
         button:draw()
     end
 end

@@ -6,19 +6,21 @@ end
 
 function menu:mousereleased(x, y, button)
     if button ~= 1 then return end
-    for option, menuButton in pairs(self.game.buttons) do
+    for option, menuButton in pairs(self.game.ui.buttons) do
         if menuButton:isClicked(x, y) then
-            local minespercentage = 0
-            if option == "easy" then mines_percentage = 11
-            elseif option == "medium" then mines_percentage = 17
-            elseif option == "hard" then mines_percentage = 23 end
-            self.game.total_mines = math.ceil(
-                mines_percentage / 100 * NUM_COLS * NUM_ROWS)
+            local ratios = {
+                easy = 0.11,
+                medium = 0.17,
+                hard = 0.23
+            }
+            
+            local board_size = self.game.board.width * self.game.board.height
+            self.game.total_mines = math.ceil(ratios[option] * board_size)
 
             self.game.difficulty = option
 
-            self.game.buttons.easy = nil
-            self.game.buttons.hard = nil
+            self.game.ui.buttons.easy = nil
+            self.game.ui.buttons.hard = nil
 
             Gamestate.switch(states.pregame, self.game)
         end

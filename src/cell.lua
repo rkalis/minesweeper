@@ -11,9 +11,10 @@ function Cell:new(x, y, size)
         size = size,
         clicked = false,
         mine = false,
-        neighbouring_mines = 0,
         checked = false,
-        flagged = false
+        flagged = false,
+        neighbouring_mines = 0,
+        neighbours = {}
     }
     setmetatable(obj, self)
     self.__index = self
@@ -70,7 +71,6 @@ end
 function Cell:click()
     if not self.flagged then
         self.clicked = true
-
         return self:checkNeighbours(true)
     end
     return nil

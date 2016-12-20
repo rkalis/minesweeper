@@ -6,7 +6,9 @@ local Board = {}
 function Board:new(width, height, cell_size, start_of_board)
     local obj = {
         start_of_board = start_of_board,
-        cell_size = cell_size
+        cell_size = cell_size,
+        width = width,
+        height = height
     }
 
     -- Set cells

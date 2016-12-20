@@ -7,7 +7,7 @@ end
 function preGame:mousereleased(x, y, button)
     if button ~= 1 then return end
 
-    if self.game.buttons.medium:isClicked(x, y) then
+    if self.game.ui.buttons.medium:isClicked(x, y) then
         Gamestate.switch(states.menu, self.game:reset())
         return
     end
@@ -15,8 +15,7 @@ function preGame:mousereleased(x, y, button)
     local cell = self.game.board:mouseToCell(x, y)
     if not cell then return end
 
-    self.game.board:placeMines(cell, self.game.total_mines)
-    self.game.start_time = love.timer.getTime()
+    self.game:start(cell)
 
     cell:click()
 
