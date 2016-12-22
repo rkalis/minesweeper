@@ -1,7 +1,8 @@
 local game = {}
 
-function game:enter(previous, game)
+function game:enter(previous, game, x, y)
     self.game = game
+    self:mousereleased(x, y, 1)
 end
 
 function game:update(dt)

@@ -54,6 +54,7 @@ function love.load()
     math.random(); math.random(); math.random(); math.random();
 
     love.graphics.setBackgroundColor(170,170,170)
+    love.graphics.setFont(love.graphics.newFont(15))
 
     Gamestate.registerEvents()
     local game = Game:new()
