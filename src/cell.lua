@@ -1,7 +1,4 @@
--- The Cell table is used for every individual square on the game board.
--- A cell can contain a mine, it can be clicked, it can be checked and it can
--- be flagged. It has a size and coordinates. It also contains the number of
--- neighbouring mines.
+local kalis = require "lib.kalis"
 local Cell = {}
 
 function Cell:new(x, y, size)
@@ -116,8 +113,7 @@ function Cell:draw()
         if self.flagged then
             self:drawSprite(assets.graphics.block.flag)
         elseif love.mouse.isDown(1) and
-           (love.mouse.getX() > self.x and love.mouse.getX() < self.x + self.size) and
-           (love.mouse.getY() > self.y and love.mouse.getY() < self.y + self.size) then
+               kalis.is_clicked(self, love.mouse.getX(), love.mouse.getY()) then
             self:drawSprite(assets.graphics.block[0])
         else
             self:drawSprite(assets.graphics.block.unclicked)
