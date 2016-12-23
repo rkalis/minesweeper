@@ -55,19 +55,18 @@ function Cell:checkNeighbours(clear_flags)
     return flags_cleared
 end
 
+-- If a cell has already been checked/clicked, it can't be flagged.
+-- Otherwise, this toggles the flag status of the cell
 function Cell:toggleFlag()
     if self.checked or self.clicked then
         return 0
     end
-    if not self.flagged then
-        self.flagged = true
-        return 1
-    elseif self.flagged then
-        self.flagged = false
-        return -1
-    end
+    self.flagged = not self.flagged
+    return self.flagged and 1 or -1
 end
 
+-- Flagged cells can't be clicked.
+-- Otherwise, the cell will be clicked and its neighbours will be checked.
 function Cell:click()
     if not self.flagged then
         self.clicked = true
@@ -80,13 +79,16 @@ function Cell:equals(other)
     return self.x == other.x and self.y == other.y
 end
 
+-- If either is in the others neighbours list, they are neighbours
 function Cell:isNeighbour(other)
     for _, cell in ipairs(self.neighbours) do
         if cell:equals(other) then return true end
     end
+    for _, cell in ipairs(other.neighbours) do
+        if cell:equals(self) then return true end
+    end
     return false
 end
-
 
 function Cell:drawSprite(sprite)
     love.graphics.draw(sprite, self.x, self.y, 0, self.size / 120)

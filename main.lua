@@ -45,19 +45,18 @@ states = {
 
 local Game = require "src.game"
 
-
--- This is the entrypoint of the code, here variables are initialised and the
--- initial state is set
 function love.load()
     -- Random seed with a few calibration randoms
     math.randomseed(os.time())
     math.random(); math.random(); math.random(); math.random();
 
+    -- Setting of the löve environment variables
     love.graphics.setBackgroundColor(170,170,170)
     love.graphics.setFont(love.graphics.newFont(15))
 
-    Gamestate.registerEvents()
     local game = Game:new()
+
+    Gamestate.registerEvents()
     Gamestate.switch(states.menu, game)
 end
 
@@ -74,8 +73,7 @@ function love.draw()
 
     game.board:draw()
 
-    -- Draws the buttons
-    for option, button in pairs(game.ui.buttons) do
+    for _, button in pairs(game.ui.buttons) do
         button:draw()
     end
 end
