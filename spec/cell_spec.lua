@@ -12,13 +12,101 @@ describe("Cell Tests", function()
     end)
 
     describe("checkNeighbours", function()
-        pending("If clear_flags, then flags should be cleared")
-        pending("If not clear_flags, then nog flags should be cleared")
-        pending("Number of cleared flags should be returned")
-        pending("If cell is a mine, then no neighbours should be checked")
-        pending("If cell is already checked, then no neighbours should be checked")
-        pending("If cell has neighbouring mines, then no neighbours should be checked")
-        pending("If cell has no neighbouring mines, then all neighbouring mines should be checked")
+        before_each(function()
+            for i = 1, 10 do
+                cell.neighbours[i] = Cell:new(CELL_X, i * CELL_Y, CELL_SIZE)
+            end
+        end)
+        it("If clear_flags, then flags should be cleared", function()
+            -- Given
+            for _, neighbour in ipairs(cell.neighbours) do
+                neighbour.flagged = true
+            end
+
+            -- When
+            cell:checkNeighbours(true)
+
+            -- Then
+            for _, neighbour in ipairs(cell.neighbours) do
+                assert.is_false(neighbour.flagged)
+            end
+        end)
+        it("If not clear_flags, then no flags should be cleared", function()
+            -- Given
+            for _, neighbour in ipairs(cell.neighbours) do
+                neighbour.flagged = true
+            end
+
+            -- When
+            cell:checkNeighbours(false)
+
+            -- Then
+            for _, neighbour in ipairs(cell.neighbours) do
+                assert.is_true(neighbour.flagged)
+            end
+        end)
+        it("Number of cleared flags should be returned", function()
+            -- Given
+            for _, neighbour in ipairs(cell.neighbours) do
+                neighbour.flagged = true
+            end
+
+            -- When
+            local cleared_flags = cell:checkNeighbours(true)
+
+            -- Then
+            assert.is.equal(cleared_flags, #cell.neighbours)
+        end)
+        it("If cell is a mine, then no neighbours should be checked", function()
+            -- Given
+            cell.mine = true
+
+            -- When
+            cell:checkNeighbours(true)
+
+            -- Then
+            for _, neighbour in ipairs(cell.neighbours) do
+                assert.is_false(neighbour.checked)
+            end
+        end)
+        it("If cell is already checked, then no neighbours should be checked", function()
+            -- Given
+            cell.checked = true
+
+            -- When
+            cell:checkNeighbours(true)
+
+            -- Then
+            for _, neighbour in ipairs(cell.neighbours) do
+                assert.is_false(neighbour.checked)
+            end
+        end)
+        it("If cell has neighbouring mines, then no neighbours should be checked", function()
+            -- Given
+            cell.neighbours[1].mine = true
+
+            -- When
+            cell:checkNeighbours(true)
+
+            -- Then
+            for _, neighbour in ipairs(cell.neighbours) do
+                assert.is_false(neighbour.checked)
+            end
+        end)
+        it("If cell has no neighbouring mines, then all neighbouring mines should be checked", function()
+            -- Given
+            for _, neighbour in ipairs(cell.neighbours) do
+                neighbour.mine = false
+            end
+
+            -- When
+            cell:checkNeighbours(true)
+
+            -- Then
+            for _, neighbour in ipairs(cell.neighbours) do
+                assert.is_true(neighbour.checked)
+            end
+        end)
     end)
 
     describe("toggleFlag", function()
