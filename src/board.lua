@@ -57,51 +57,61 @@ function Board:placeMines(clicked_cell, total_mines)
     end
 end
 
+-- Iterator over all cells in board
+function Board:cells()
+    return coroutine.wrap(
+        function()
+            for _, row in kalis.ipairs(self) do
+                for _, cell in kalis.ipairs(row) do
+                    coroutine.yield(cell)
+                end
+            end
+        end)
+end
+
+-- Returns cell found at specified board coordinates or nil
 function Board:getCell(x, y)
     if not x or not y then return nil end
     return self[y][x]
 end
 
+-- Returns a random cell
 function Board:getRandomCell()
     local random_row = self[math.random(0, #self)]
     return random_row[math.random(0, #random_row)]
 end
 
+-- Returns cell found at the specified mouse coordinates
 function Board:mouseToCell(mouse_x, mouse_y)
     return self:getCell(self:mouseToBoard(mouse_x, mouse_y))
 end
 
+-- Returns board coordinates for the specified mouse coordinates
 function Board:mouseToBoard(mouse_x, mouse_y)
     if mouse_y < self.start_of_board then return nil end
-    local clicked_y = math.floor((mouse_y - self.start_of_board) / self.cell_size)
-    local clicked_x = math.floor(mouse_x / self.cell_size)
-    return clicked_x, clicked_y
+    local board_y = math.floor((mouse_y - self.start_of_board) / self.cell_size)
+    local board_x = math.floor(mouse_x / self.cell_size)
+    return board_x, board_y
 end
 
 function Board:clear()
-    for _, row in kalis.ipairs(self) do
-        for _, cell in kalis.ipairs(row) do
-            cell:checkNeighbours(false)
-        end
+    for cell in self:cells()
+        cell:checkNeighbours(false)
     end
 end
 
 function Board:isCleared()
-    for _, row in kalis.ipairs(self) do
-        for _, cell in kalis.ipairs(row) do
-            if not cell.mine and not cell.checked then
-                return false
-            end
+    for cell in self:cells() do
+        if not cell.mine and not cell.checked then
+            return false
         end
     end
     return true
 end
 
 function Board:draw()
-    for _, row in kalis.ipairs(self) do
-        for _, cell in kalis.ipairs(row) do
-            cell:draw()
-        end
+    for cell in self:cells()
+        cell:draw()
     end
 end
 
