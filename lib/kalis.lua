@@ -48,8 +48,9 @@ end
 --  t2 - the table that should be concatenated
 -- @Returns:
 --  void
-function functions.table_concat(t1, t2)
+function functions.concat(t1, t2)
     if not t2 then return end
+    if type(t1) ~= "table" or type(t2) ~= "table" then return end
     local tinsert = table.insert
     local tremove = table.remove
     for key, value in pairs(t2) do
@@ -137,15 +138,45 @@ end
 --  iterator over all entries in t with numeric keys of 0 or higher
 function functions.ipairs(t)
   local function ipairs_it(t, i)
-    i = i+1
+    i = i + 1
     local v = t[i]
     if v ~= nil then
-      return i,v
+      return i, v
     else
       return nil
     end
   end
   return ipairs_it, t, -1
+end
+
+-- Returns a slice of the specified table
+-- @Arguments
+--  table - table to slice
+--  first - first element of the slice (default 1)
+--  last  - last element of the slice (default #table)
+--  step  - step size to use when slicing (default 1)
+-- @Returns
+--  sliced table
+function functions.slice(table, first, last, step)
+  local sliced = {}
+  for i = first or 1, last or #table, step or 1 do
+    sliced[#sliced + 1] = table[i]
+  end
+  return sliced
+end
+
+-- Returns all entries returned by an iterator. Only works with iterators that
+-- return single values
+-- @Arguments
+--  ... - iterator call
+-- @Returns
+--  table with iterator contents
+function functions.iter_all(...)
+    local table = {}
+    for value in ... do
+      table[#table + 1] = value
+    end
+    return table
 end
 
 return functions
