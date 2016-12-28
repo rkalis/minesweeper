@@ -1,3 +1,4 @@
+local kalis = require "lib.kalis"
 local Highscores = {}
 
 -- Creates new highscores at the given files, creating the files if they
@@ -37,24 +38,21 @@ end
 -- This table is saved in the highscores table.
 function Highscores:load(difficulty)
     -- This saves every line in the highscoresFile in a temporary table.
-    local temp = {}
     self.files[difficulty]:open("r")
-    for line in self.files[difficulty]:lines() do
-        table.insert(temp, line)
-    end
+    local temp = kalis.iter_all(self.files[difficulty]:lines())
 
     -- This saves the different variables in the file (seperated by a space)
     -- to the highscores table as seperate variables within a table.
-    for i = 1, 11 do
+    for i = 1, 10 do
         if temp[i] then
-            local index = 1
             self.highscores[difficulty][i] = {}
-            for entry in string.gmatch(temp[i], "(%w+)") do
-                if index == 2 then
-                    entry = tonumber(entry)
-                end
-                self.highscores[difficulty][i][index] = entry
-                index = index + 1
+            local score = kalis.iter_all(string.gmatch(temp[i], "(%w+)"))
+            if #score == 2 and tonumber(score[2]) then
+                self.highscores[difficulty][i][1] = score[1]
+                self.highscores[difficulty][i][2] = tonumber(score[2])
+            else
+                table.remove(temp, i)
+                i = i - 1
             end
         end
     end
@@ -80,35 +78,6 @@ function Highscores:save(difficulty)
         end
     end
     self.files[difficulty]:close()
-end
-
-
--- TODO: Make this more dynamic
-function Highscores:draw(difficulty)
-    love.graphics.setColor(0,0,0)
-    love.graphics.rectangle("line", WINDOW_WIDTH / 2 - 125,
-                            WINDOW_HEIGHT / 2 - 200, 250, 400)
-    love.graphics.setColor(200,200,200)
-    love.graphics.rectangle("fill", WINDOW_WIDTH / 2 - 125,
-                            WINDOW_HEIGHT / 2 - 200, 250, 400)
-    love.graphics.setColor(0,0,0)
-    love.graphics.printf("HIGH SCORES:", WINDOW_WIDTH / 2 - 125,
-                         WINDOW_HEIGHT / 2 - 190, 250, "center")
-    for i = 1, 10 do
-        if  self.highscores[difficulty][i]
-        and self.highscores[difficulty][i][1]
-        and self.highscores[difficulty][i][2] then
-            love.graphics.print(i, WINDOW_WIDTH / 2 - 110,
-                                   WINDOW_HEIGHT / 2 - 150 + i * 20)
-            love.graphics.print(self.highscores[difficulty][i][1],
-                                WINDOW_WIDTH / 2 - 80,
-                                WINDOW_HEIGHT / 2 - 150 + i * 20)
-            love.graphics.print(self.highscores[difficulty][i][2],
-                                WINDOW_WIDTH / 2 + 70,
-                                WINDOW_HEIGHT / 2 - 150 + i * 20)
-        end
-    end
-    love.graphics.setColor(255,255,255)
 end
 
 -- Bubble Sort algorithm:
@@ -152,14 +121,39 @@ function Highscores.compareScore(score1, score2)
     end
 end
 
--- TODO: Make this more efficient
 function Highscores:addScore(difficulty, name, score)
-    self.files[difficulty]:open("a")
-    self.files[difficulty]:write(name .. " " .. math.floor(score) .. "\n")
-    self.files[difficulty]:close()
     self:load(difficulty)
+    table.insert(self.highscores[difficulty], {name, math.floor(score)})
     self:sort(difficulty)
     self:save(difficulty)
+end
+
+-- TODO: Make this more dynamic
+function Highscores:draw(difficulty)
+    love.graphics.setColor(0,0,0)
+    love.graphics.rectangle("line", WINDOW_WIDTH / 2 - 125,
+                            WINDOW_HEIGHT / 2 - 200, 250, 400)
+    love.graphics.setColor(200,200,200)
+    love.graphics.rectangle("fill", WINDOW_WIDTH / 2 - 125,
+                            WINDOW_HEIGHT / 2 - 200, 250, 400)
+    love.graphics.setColor(0,0,0)
+    love.graphics.printf("HIGH SCORES:", WINDOW_WIDTH / 2 - 125,
+                         WINDOW_HEIGHT / 2 - 190, 250, "center")
+    for i = 1, 10 do
+        if  self.highscores[difficulty][i]
+        and self.highscores[difficulty][i][1]
+        and self.highscores[difficulty][i][2] then
+            love.graphics.print(i, WINDOW_WIDTH / 2 - 110,
+                                   WINDOW_HEIGHT / 2 - 150 + i * 20)
+            love.graphics.print(self.highscores[difficulty][i][1],
+                                WINDOW_WIDTH / 2 - 80,
+                                WINDOW_HEIGHT / 2 - 150 + i * 20)
+            love.graphics.print(self.highscores[difficulty][i][2],
+                                WINDOW_WIDTH / 2 + 70,
+                                WINDOW_HEIGHT / 2 - 150 + i * 20)
+        end
+    end
+    love.graphics.setColor(255,255,255)
 end
 
 return Highscores
