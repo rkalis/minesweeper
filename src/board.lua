@@ -72,6 +72,7 @@ end
 -- Returns cell found at specified board coordinates or nil
 function Board:getCell(x, y)
     if not x or not y then return nil end
+    if x < 0 or x > self.width or y < 0 or y > self.height then return nil end
     return self[y][x]
 end
 
@@ -95,7 +96,7 @@ function Board:mouseToBoard(mouse_x, mouse_y)
 end
 
 function Board:clear()
-    for cell in self:cells()
+    for cell in self:cells() do
         cell:checkNeighbours(false)
     end
 end
@@ -110,7 +111,7 @@ function Board:isCleared()
 end
 
 function Board:draw()
-    for cell in self:cells()
+    for cell in self:cells() do
         cell:draw()
     end
 end
