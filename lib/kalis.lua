@@ -179,4 +179,19 @@ function functions.iter_all(...)
     return table
 end
 
+-- Checks if an element is present in a table
+-- @Arguments
+--  table   - Table to check in
+--  element - Value to be checkd for
+-- @Returns
+--  true if element in table, false if not
+function functions.contains(table, element)
+  for _, value in pairs(table) do
+    if value == element then
+      return true
+    end
+  end
+  return false
+end
+
 return functions
