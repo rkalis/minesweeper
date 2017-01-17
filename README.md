@@ -2,11 +2,16 @@
 ## The game
 This is a Minesweeper game with a constant board with three difficulties. The difficulty can be chosen at the start of the game. It features quirky graphics, amazing sound effects, and local high scores per difficulty. Every part was made by me, including the graphics and sound effects. Enjoy!
 
+## Running the game
+There is a standalone web version built with [love.js](https://github.com/TannerRogalsky/love.js), which can be found at [kalis.me/LuaSweeper](http://kalis.me/LuaSweeper).
+
+Alternatively, it can be built locally into a standalone application through the [love2d build instructions](https://www.love2d.org/wiki/Game_Distribution), or run locally through the [love2d getting started instructions](https://www.love2d.org/wiki/Getting_Started).
+
 ## Screenshots
-<img src="https://i.imgur.com/s9CPIz1.png" width="23%"/>
-<img src="https://i.imgur.com/mI79q8C.png" width="23%"/>
-<img src="https://i.imgur.com/l2Je4rY.png" width="23%"/>
-<img src="https://i.imgur.com/e5yEC6Q.png" width="23%"/>
+<img src="https://i.imgur.com/s9CPIz1.png" width="24.5%"/>
+<img src="https://i.imgur.com/mI79q8C.png" width="24.5%"/>
+<img src="https://i.imgur.com/l2Je4rY.png" width="24.5%"/>
+<img src="https://i.imgur.com/e5yEC6Q.png" width="24.5%"/>
 
 ## The history
 This Minesweeper game was originally made in a week for a first year University assignment.
