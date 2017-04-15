@@ -27,12 +27,12 @@ As it turns out, having all your files in a the same top-level folder gets unman
 So first off the assets had to be moved to their own folder, which cleaned up pretty well, but as the refactoring went on, more and more code files emerged, which led to the file structure as it is today:
 
 * assets/
- * audio/
- * graphics/
+  * audio/
+  * graphics/
 * lib/
 * spec/
 * src/
- * ui/
+  * ui/
 * states/
 * main.lua
 * conf.lua
