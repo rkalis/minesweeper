@@ -3,7 +3,7 @@
 This is a Minesweeper game with a constant board with three difficulties. The difficulty can be chosen at the start of the game. It features quirky graphics, amazing sound effects, and local high scores per difficulty. Every part was made by me, including the graphics and sound effects. Enjoy!
 
 ## Running the game
-There is a standalone web version built with [love.js](https://github.com/TannerRogalsky/love.js), which can be found at [kalis.me/minesweeper](http://kalis.me/minesweeper).
+There is a standalone web version built with [love.js](https://github.com/TannerRogalsky/love.js), which can be found at [minesweeper.kalis.me](http://minesweeper.kalis.me).
 
 Alternatively, it can be built locally into a standalone application through the [love2d build instructions](https://www.love2d.org/wiki/Game_Distribution), or run locally through the [love2d getting started instructions](https://www.love2d.org/wiki/Getting_Started).
 
