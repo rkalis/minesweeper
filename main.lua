@@ -1,79 +1,62 @@
--- LuaSweeper/main.lua
-
--- * This application runs my personal version of the famous game Minesweeper.
--- * At the start the user can select a difficulty. Based on this
---   selection the total number of mines will be determined.
--- * A user then starts the game and the timer by clicking a cell on the field.
--- * A number of cells will be selected to be mines at random, but they can not
---   be the initially clicked cell or any of its neighbours.
--- * If a cell is right clicked, the cell will be flagged, marking it as a mine,
---   and making it unable to be left clicked until the flag is removed again.
--- * If a cell is left clicked its clicked state is set to true and the
---   checkNeighbours function is called, in which a cascading algorithm is
---   executed.
--- * After cascading, the number of surrounding mines is displyed in every
---   revealed cell unless there are none, then nothing is displayed in the
---   cell.
--- * There are two ways to end the game:
---   - A cell which contains a mine is clicked
---   - All cells on the board are either revealed or mines
--- * As soon as one of these requirements is met, the game state changes to
---   endgame and the board is completely revealed.
--- * After three seconds the user is prompted to enter their name, after which
---   the high scores are shown.
--- * If at any time the smiley at the top of the game board is clicked, the
---   game is reset.
--- * Another thing that could be nice to add to the game would be custom
---   game modes, in which the user enters a number of columns, a number of rows,
---   and a cell size, and based on these variables the board is created.
---   It is already possible to do this through the conf.lua file, but it would
---   be nice to add end-user support for this. A man can only do so much in a
---   week though.
--- * All graphics and sound effects were made by me.
-
-assets = require "assets.assets"
-Gamestate = require "lib.gamestate"
-
-states = {
-    menu = require "states.menu",
-    pregame = require "states.pregame",
-    game = require "states.game",
-    endgame = require "states.endgame",
-    enterHighScores = require "states.enterHighScores",
-    displayHighScores = require "states.displayHighScores"
+Cell = {
+    x,
+    y
 }
 
-local Game = require "src.game"
-
-function love.load()
-    -- Random seed with a few calibration randoms
-    math.randomseed(os.time())
-    math.random(); math.random(); math.random(); math.random();
-
-    -- Setting of the löve environment variables
-    love.graphics.setBackgroundColor(170,170,170)
-    love.graphics.setFont(love.graphics.newFont(15))
-
-    local game = Game:new()
-
-    Gamestate.registerEvents()
-    Gamestate.switch(states.menu, game)
+function Cell:new(x, y)
+    obj = {
+        x = x,
+        y = y,
+    }
+    setmetatable(obj, self)
+    self.__index = self
+    return obj
 end
 
+function Cell:checkNeighbours(index1, index2)
+end
+
+Button = {
+    x,
+    y,
+    width = 60,
+    height = 60
+}
+
+function Button:new(x, y)
+    obj = {
+        x = x,
+        y = y
+    }
+    setmetatable(obj, self)
+    self.__index = self
+    return obj
+end
+
+-- love.load() is called at the start of the game.
+-- It can be used to setup the game.
+function love.load()
+    math.randomseed(os.time())
+    math.random(); math.random(); math.random(); math.random();
+    love.graphics.setBackgroundColor(170,170,170)
+end
+
+-- love.draw() is called every timestep. It can be used for game logic
+-- and time-based calculations as a dt parameter is passed, which signifies
+-- the time that has passed since the last timestep
+function love.update(dt)
+end
+
+-- love.mousereleased is called whenever the mouse is released,
+-- with the parameters specifying the button and position
+function love.mousereleased(x, y, button)
+end
+
+-- love.keypressed is called whenever a key is pressed, with the
+-- `key` parameter specifying which key
+function love.keypressed(key)
+end
+
+-- love.draw() is called every timestep. It is used to draw to the window
 function love.draw()
-    local game = Gamestate:current().game
-    game.ui.buttons.medium.smiley = "def"
-
-    if love.mouse.isDown(1) then
-        local cell = game.board:mouseToCell(love.mouse.getX(), love.mouse.getY())
-        if cell and not cell.checked and not cell.flagged then
-            game.ui.buttons.medium.smiley = "o"
-        end
-    end
-
-    game.board:draw()
-
-    for _, button in pairs(game.ui.buttons) do
-        button:draw()
-    end
 end
