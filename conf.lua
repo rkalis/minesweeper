@@ -12,7 +12,7 @@ function love.conf(t)
     t.version = "0.10.0"
     t.console = false
 
-    t.window.title          = "Minesweeper Xxtreme Relo4ded 2.0: Retribution"
+    t.window.title          = "Minesweeper"
     t.window.width          = WINDOW_WIDTH
     t.window.height         = WINDOW_HEIGHT
     t.window.borderless     = false

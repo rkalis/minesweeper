@@ -1,7 +1,4 @@
-Cell = {
-    x,
-    y
-}
+Cell = {}
 
 function Cell:new(x, y)
     obj = {
@@ -13,20 +10,17 @@ function Cell:new(x, y)
     return obj
 end
 
-function Cell:checkNeighbours(index1, index2)
+function Cell:checkNeighbours()
 end
 
-Button = {
-    x,
-    y,
-    width = 60,
-    height = 60
-}
+Button = {}
 
 function Button:new(x, y)
     obj = {
         x = x,
-        y = y
+        y = y,
+        width = 60,
+        height = 60
     }
     setmetatable(obj, self)
     self.__index = self
@@ -36,6 +30,8 @@ end
 -- love.load() is called at the start of the game.
 -- It can be used to setup the game.
 function love.load()
+    -- Seeds the math.random() function, and calibrates it with a few
+    -- calibration calls.
     math.randomseed(os.time())
     math.random(); math.random(); math.random(); math.random();
     love.graphics.setBackgroundColor(170,170,170)

@@ -1,1 +1,1 @@
-# LuaSweeper
+# Minesweeper
